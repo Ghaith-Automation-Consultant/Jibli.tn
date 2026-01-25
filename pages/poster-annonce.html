@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <base target="_self">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publier une annonce - Jibli.tn</title>
+    <meta name="description" content="Publiez un voyage ou faites une demande sur Jibli.tn">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../js/tailwind.config.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="min-h-screen bg-neutral-50 font-inter">
+    <!-- Header avec navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <a href="#" class="flex items-center" onclick="navigateTo('home')">
+                        <img src="../assets/logos/Jibli.tn.png" alt="Jibli.tn" class="h-12 w-auto object-contain">
+                    </a>
+                </div>
+
+                <!-- Navigation principale -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="#" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                        onclick="navigateTo('home')">Accueil</a>
+                    <a href="#" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                        onclick="navigateTo('voyages')">Voyages</a>
+                    <a href="#" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                        onclick="navigateTo('demandes')">Demandes</a>
+                    <a href="#" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                        onclick="navigateTo('dashboard')">Dashboard</a>
+                </div>
+
+                <!-- Actions utilisateur -->
+                <div class="flex items-center space-x-4">
+                    <div id="userMenu" class="block">
+                        <button id="userMenuBtn" class="flex items-center space-x-2">
+                            <div class="w-10 h-10 bg-neutral-200 rounded-full overflow-hidden">
+                                <img src="https://picsum.photos/40?random=100" alt="Photo de profil"
+                                    class="w-full h-full object-cover">
+                            </div>
+                            <span class="text-neutral-500 font-medium hidden md:inline">Mohamed</span>
+                            <i class="fas fa-chevron-down text-xs text-neutral-500 hidden md:inline"></i>
+                        </button>
+                    </div>
+                    <!-- Menu mobile -->
+                    <button id="mobileMenuBtn" class="md:hidden text-neutral-500">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Menu mobile dropdown -->
+            <div id="mobileMenu" class="hidden md:hidden mt-4 pt-4 border-t border-neutral-200">
+                <div class="flex flex-col space-y-3">
+                    <a href="#" class="text-neutral-500 hover:text-primary py-2"
+                        onclick="navigateTo('home')">Accueil</a>
+                    <a href="#" class="text-neutral-500 hover:text-primary py-2"
+                        onclick="navigateTo('voyages')">Voyages</a>
+                    <a href="#" class="text-neutral-500 hover:text-primary py-2"
+                        onclick="navigateTo('demandes')">Demandes</a>
+                    <a href="#" class="text-neutral-500 hover:text-primary py-2"
+                        onclick="navigateTo('dashboard')">Dashboard</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="py-12">
+        <div class="container mx-auto px-4 max-w-3xl">
+            <h1 class="text-3xl font-bold text-center text-neutral-900 mb-8">Publier une annonce</h1>
+
+            <!-- Choix du type d'annonce -->
+            <div class="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden mb-8">
+                <div class="flex border-b border-neutral-200">
+                    <button id="tabTrip"
+                        class="w-1/2 py-4 text-center font-bold text-primary border-b-2 border-primary bg-blue-50 transition-colors"
+                        onclick="switchTab('trip')">
+                        <i class="fas fa-plane-departure mr-2"></i> Proposer un voyage
+                    </button>
+                    <button id="tabRequest"
+                        class="w-1/2 py-4 text-center font-medium text-neutral-500 hover:bg-neutral-50 transition-colors"
+                        onclick="switchTab('request')">
+                        <i class="fas fa-box mr-2"></i> Faire une demande
+                    </button>
+                </div>
+
+                <div class="p-6 md:p-8">
+                    <!-- Formulaire Voyage -->
+                    <form id="tripFormFull" onsubmit="handleCreateTrip(event)">
+                        <div class="mb-8">
+                            <h2 class="text-xl font-bold text-neutral-900 mb-4">Détails du trajet</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                                <div>
+                                    <label class="block text-neutral-700 font-medium mb-2">Ville de départ *</label>
+                                    <div class="relative">
+                                        <i class="fas fa-map-marker-alt absolute left-3 top-3 text-neutral-400"></i>
+                                        <input type="text" required placeholder="Ex: Paris"
+                                            class="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-neutral-700 font-medium mb-2">Ville d'arrivée *</label>
+                                    <div class="relative">
+                                        <i class="fas fa-map-marker-alt absolute left-3 top-3 text-neutral-400"></i>
+                                        <input type="text" required placeholder="Ex: Tunis"
+                                            class="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-neutral-700 font-medium mb-2">Date de départ *</label>
+                                    <input type="date" required
+                                        class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                                </div>
+                                <div>
+                                    <label class="block text-neutral-700 font-medium mb-2">Heure de départ
+                                        (Est.)</label>
+                                    <input type="time"
+                                        class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-8 border-t border-neutral-100 pt-6">
+                            <h2 class="text-xl font-bold text-neutral-900 mb-4">Capacité et Objets</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <label class="block text-neutral-700 font-medium mb-2">Poids disponible (kg)
+                                        *</label>
+                                    <div class="relative">
+                                        <i class="fas fa-weight-hanging absolute left-3 top-3 text-neutral-400"></i>
+                                        <input type="number" required min="0" step="0.5" placeholder="Ex: 10"
+                                            class="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-neutral-700 font-medium mb-2">Taille max acceptée *</label>
+                                    <select
+                                        class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                                        <option value="S">Petit (S) - Enveloppe, clés...</option>
+                                        <option value="M">Moyen (M) - Sac à dos, chaussure...</option>
+                                        <option value="L">Grand (L) - Valise cabine...</option>
+                                        <option value="XL">Très grand (XL) - Valise soute...</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <label class="block text-neutral-700 font-medium mb-3">Objets acceptés</label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+                                <label
+                                    class="flex items-center p-3 border border-neutral-200 rounded-lg hover:bg-neutral-50 cursor-pointer">
+                                    <input type="checkbox"
+                                        class="mr-3 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                    <span>Documents</span>
+                                </label>
+                                <label
+                                    class="flex items-center p-3 border border-neutral-200 rounded-lg hover:bg-neutral-50 cursor-pointer">
+                                    <input type="checkbox"
+                                        class="mr-3 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                    <span>Vêtements</span>
+                                </label>
+                                <label
+                                    class="flex items-center p-3 border border-neutral-200 rounded-lg hover:bg-neutral-50 cursor-pointer">
+                                    <input type="checkbox"
+                                        class="mr-3 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                    <span>Médicaments</span>
+                                </label>
+                                <label
+                                    class="flex items-center p-3 border border-neutral-200 rounded-lg hover:bg-neutral-50 cursor-pointer">
+                                    <input type="checkbox"
+                                        class="mr-3 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                    <span>Électronique</span>
+                                </label>
+                                <label
+                                    class="flex items-center p-3 border border-neutral-200 rounded-lg hover:bg-neutral-50 cursor-pointer">
+                                    <input type="checkbox"
+                                        class="mr-3 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                    <span>Nourriture (sec)</span>
+                                </label>
+                                <label
+                                    class="flex items-center p-3 border border-neutral-200 rounded-lg hover:bg-neutral-50 cursor-pointer">
+                                    <input type="checkbox"
+                                        class="mr-3 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                                    <span>Autre</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-8 border-t border-neutral-100 pt-6">
+                            <h2 class="text-xl font-bold text-neutral-900 mb-4">Conditions et Prix</h2>
+                            <div class="mb-4">
+                                <label class="block text-neutral-700 font-medium mb-3">Type de service</label>
+                                <div class="flex space-x-6">
+                                    <label class="flex items-center">
+                                        <input type="radio" name="priceTypeFull" value="free" checked
+                                            class="mr-2 h-4 w-4 text-primary focus:ring-primary"
+                                            onclick="togglePriceField(false)">
+                                        <span class="font-medium">Gratuit (Solidarité)</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="radio" name="priceTypeFull" value="paid"
+                                            class="mr-2 h-4 w-4 text-primary focus:ring-primary"
+                                            onclick="togglePriceField(true)">
+                                        <span class="font-medium">Contre rémunération</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div id="priceFieldFull" class="hidden mb-6">
+                                <label class="block text-neutral-700 font-medium mb-2">Prix par Kg (€)</label>
+                                <input type="number" min="0" step="0.5" placeholder="Ex: 8"
+                                    class="w-full md:w-1/3 px-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                            </div>
+
+                            <div class="mb-6">
+                                <label class="block text-neutral-700 font-medium mb-2">Description / Message
+                                    (Optionnel)</label>
+                                <textarea rows="4"
+                                    placeholder="Précisez votre trajet, vos lieux de rendez-vous possibles, etc."
+                                    class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"></textarea>
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full py-4 bg-primary text-white font-bold text-lg rounded-lg hover:bg-primary-hover transition-all shadow-md hover:shadow-lg">
+                            Publier mon voyage
+                        </button>
+                    </form>
+
+                    <!-- Formulaire Demande (Initialement caché) -->
+                    <form id="requestFormFull" class="hidden" onsubmit="handleCreateRequest(event)">
+                        <div class="mb-8">
+                            <h2 class="text-xl font-bold text-neutral-900 mb-4">Ce que vous cherchez</h2>
+                            <div class="mb-4">
+                                <label class="block text-neutral-700 font-medium mb-2">Objet recherché *</label>
+                                <input type="text" required placeholder="Ex: Pièce détachée auto, Documents..."
+                                    class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-neutral-700 font-medium mb-2">Lien web (Optionnel)</label>
+                                <input type="url" placeholder="https://..."
+                                    class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                                <p class="text-xs text-neutral-500 mt-1">Si l'objet est à acheter en ligne</p>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-neutral-700 font-medium mb-2">Poids estimé (kg)</label>
+                                    <div class="relative">
+                                        <i class="fas fa-weight-hanging absolute left-3 top-3 text-neutral-400"></i>
+                                        <input type="number" min="0" step="0.1" placeholder="Ex: 0.5"
+                                            class="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-neutral-700 font-medium mb-2">Taille approximative</label>
+                                    <select
+                                        class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                                        <option value="S">Petit (S)</option>
+                                        <option value="M">Moyen (M)</option>
+                                        <option value="L">Grand (L)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-8 border-t border-neutral-100 pt-6">
+                            <h2 class="text-xl font-bold text-neutral-900 mb-4">Trajet souhaité</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                                <div>
+                                    <label class="block text-neutral-700 font-medium mb-2">Depuis (Ville/Pays)</label>
+                                    <div class="relative">
+                                        <i class="fas fa-map-marker-alt absolute left-3 top-3 text-neutral-400"></i>
+                                        <input type="text" placeholder="Ex: France"
+                                            class="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-neutral-700 font-medium mb-2">Vers (Ville/Pays) *</label>
+                                    <div class="relative">
+                                        <i class="fas fa-map-marker-alt absolute left-3 top-3 text-neutral-400"></i>
+                                        <input type="text" required placeholder="Ex: Tunis"
+                                            class="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-neutral-700 font-medium mb-2">Date limite (Optionnel)</label>
+                                <input type="date"
+                                    class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                            </div>
+                        </div>
+
+                        <div class="mb-8 border-t border-neutral-100 pt-6">
+                            <h2 class="text-xl font-bold text-neutral-900 mb-4">Récompense</h2>
+                            <div class="mb-4">
+                                <label class="block text-neutral-700 font-medium mb-2">Budget proposé (€) *</label>
+                                <div class="relative">
+                                    <i class="fas fa-euro-sign absolute left-3 top-3 text-neutral-400"></i>
+                                    <input type="number" required min="0" placeholder="Ex: 20"
+                                        class="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                                </div>
+                                <p class="text-xs text-neutral-500 mt-1">Commission pour le voyageur</p>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-neutral-700 font-medium mb-2">Description détaillée</label>
+                                <textarea rows="4"
+                                    placeholder="Donnez plus de détails sur l'objet et vos contraintes..."
+                                    class="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"></textarea>
+                            </div>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full py-4 bg-accent text-neutral-900 font-bold text-lg rounded-lg hover:bg-accent-hover transition-all shadow-md hover:shadow-lg">
+                            Publier ma demande
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-neutral-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <img src="../assets/logos/Jibli.tn.png" alt="Jibli.tn"
+                            class="h-10 w-auto object-contain bg-white rounded p-1">
+                    </div>
+                    <p class="text-neutral-400">
+                        La plateforme peer-to-peer qui connecte la diaspora tunisienne avec la Tunisie.
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Navigation</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors"
+                                onclick="navigateTo('home')">Accueil</a></li>
+                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors"
+                                onclick="navigateTo('voyages')">Voyages</a></li>
+                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors"
+                                onclick="navigateTo('demandes')">Demandes</a></li>
+                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors"
+                                onclick="navigateTo('dashboard')">Dashboard</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Légal</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors">Conditions
+                                d'utilisation</a></li>
+                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors">Politique de
+                                confidentialité</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Contact</h3>
+                    <ul class="space-y-2">
+                        <li class="text-neutral-400">contact@jibli.tn</li>
+                        <li class="text-neutral-400">Support technique</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-neutral-800 mt-8 pt-8 text-center text-neutral-400">
+                <p>&copy; 2024 Jibli.tn - Tous droits réservés</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+        // Page specific logic
+        function switchTab(tab) {
+            const tripBtn = document.getElementById('tabTrip');
+            const requestBtn = document.getElementById('tabRequest');
+            const tripForm = document.getElementById('tripFormFull');
+            const requestForm = document.getElementById('requestFormFull');
+
+            if (tab === 'trip') {
+                tripBtn.classList.add('border-b-2', 'border-primary', 'bg-blue-50', 'text-primary');
+                tripBtn.classList.remove('bg-transparent', 'text-neutral-500');
+                tripBtn.classList.add('font-bold');
+
+                requestBtn.classList.remove('border-b-2', 'border-primary', 'bg-blue-50', 'text-primary', 'font-bold');
+                requestBtn.classList.add('text-neutral-500');
+
+                tripForm.classList.remove('hidden');
+                requestForm.classList.add('hidden');
+            } else {
+                requestBtn.classList.add('border-b-2', 'border-primary', 'bg-blue-50', 'text-primary');
+                requestBtn.classList.remove('bg-transparent', 'text-neutral-500');
+                requestBtn.classList.add('font-bold');
+
+                tripBtn.classList.remove('border-b-2', 'border-primary', 'bg-blue-50', 'text-primary', 'font-bold');
+                tripBtn.classList.add('text-neutral-500');
+
+                requestForm.classList.remove('hidden');
+                tripForm.classList.add('hidden');
+            }
+        }
+
+        function togglePriceField(show) {
+            const field = document.getElementById('priceFieldFull');
+            if (show) {
+                field.classList.remove('hidden');
+            } else {
+                field.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+
+</html>

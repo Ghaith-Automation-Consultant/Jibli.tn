@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <base target="_self">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails du voyage - Jibli.tn</title>
+    <meta name="description" content="Détails du voyage Paris vers Tunis - Jibli.tn">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../js/tailwind.config.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="min-h-screen bg-neutral-50 font-inter">
+    <!-- Header avec navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <a href="#" class="flex items-center" onclick="navigateTo('home')">
+                        <img src="../assets/logos/Jibli.tn.png" alt="Jibli.tn" class="h-12 w-auto object-contain">
+                    </a>
+                </div>
+
+                <!-- Navigation principale -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="#" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                        onclick="navigateTo('home')">Accueil</a>
+                    <a href="#" class="text-primary font-medium border-b-2 border-primary pb-1">Voyages</a>
+                    <a href="#" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                        onclick="navigateTo('demandes')">Demandes</a>
+                    <a href="#" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                        onclick="navigateTo('dashboard')">Dashboard</a>
+                </div>
+
+                <!-- Actions utilisateur -->
+                <div class="flex items-center space-x-4">
+                    <div id="userMenu" class="block">
+                        <button id="userMenuBtn" class="flex items-center space-x-2">
+                            <div class="w-10 h-10 bg-neutral-200 rounded-full overflow-hidden">
+                                <img src="https://picsum.photos/40?random=100" alt="Photo de profil"
+                                    class="w-full h-full object-cover">
+                            </div>
+                            <span class="text-neutral-500 font-medium hidden md:inline">Mohamed</span>
+                            <i class="fas fa-chevron-down text-xs text-neutral-500 hidden md:inline"></i>
+                        </button>
+                    </div>
+                    <!-- Menu mobile -->
+                    <button id="mobileMenuBtn" class="md:hidden text-neutral-500">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Menu mobile dropdown -->
+            <div id="mobileMenu" class="hidden md:hidden mt-4 pt-4 border-t border-neutral-200">
+                <div class="flex flex-col space-y-3">
+                    <a href="#" class="text-neutral-500 hover:text-primary py-2"
+                        onclick="navigateTo('home')">Accueil</a>
+                    <a href="#" class="text-primary py-2">Voyages</a>
+                    <a href="#" class="text-neutral-500 hover:text-primary py-2"
+                        onclick="navigateTo('demandes')">Demandes</a>
+                    <a href="#" class="text-neutral-500 hover:text-primary py-2"
+                        onclick="navigateTo('dashboard')">Dashboard</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="py-12">
+        <div class="container mx-auto px-4">
+            <!-- Breadcrumb -->
+            <nav class="flex mb-8 text-neutral-500 text-sm">
+                <a href="#" class="hover:text-primary" onclick="navigateTo('home')">Accueil</a>
+                <span class="mx-2">/</span>
+                <a href="#" class="hover:text-primary" onclick="navigateTo('voyages')">Voyages</a>
+                <span class="mx-2">/</span>
+                <span class="text-neutral-900 font-medium">Paris → Tunis</span>
+            </nav>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Détails du voyage (Gauche) -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Carte principale -->
+                    <div class="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
+                        <!-- En-tête du voyage -->
+                        <div class="p-6 border-b border-neutral-200 bg-gradient-to-r from-neutral-50 to-white">
+                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+                                <div class="flex items-center space-x-3 mb-2 md:mb-0">
+                                    <h1 class="text-2xl md:text-3xl font-bold text-neutral-900">Paris</h1>
+                                    <i class="fas fa-arrow-right text-gray-400"></i>
+                                    <h1 class="text-2xl md:text-3xl font-bold text-neutral-900">Tunis</h1>
+                                </div>
+                                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                                    Voyage vérifié
+                                </span>
+                            </div>
+                            <div class="flex flex-wrap gap-4 text-neutral-600">
+                                <div class="flex items-center">
+                                    <i class="fas fa-calendar-alt mr-2 text-primary"></i>
+                                    <span>Départ : 15 Mars 2024</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-clock mr-2 text-primary"></i>
+                                    <span>Arrivée : 15 Mars 2024 (Soir)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Info Voyageur -->
+                        <div class="p-6 border-b border-neutral-200">
+                            <h2 class="text-lg font-bold text-neutral-900 mb-4">Proposé par</h2>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="w-16 h-16 bg-neutral-200 rounded-full overflow-hidden mr-4 relative">
+                                        <img src="https://picsum.photos/64?random=101" alt="Profil voyageur"
+                                            class="w-full h-full object-cover">
+                                        <div
+                                            class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-bold text-neutral-900">Karim Ben Ali</h3>
+                                        <div class="flex items-center text-sm text-neutral-500 mt-1">
+                                            <div class="flex text-yellow-500 mr-2">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star-half-alt"></i>
+                                            </div>
+                                            <span>4.8 (24 avis)</span>
+                                            <span class="mx-2">•</span>
+                                            <span>Membre depuis 2023</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button
+                                    class="hidden md:block text-primary hover:bg-neutral-50 px-4 py-2 rounded-md border border-transparent hover:border-neutral-200 transition">
+                                    Voir le profil
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Détails Logistiques -->
+                        <div class="p-6">
+                            <h2 class="text-lg font-bold text-neutral-900 mb-6">Détails de l'offre</h2>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                <div class="p-4 bg-neutral-50 rounded-lg border border-neutral-100">
+                                    <div class="flex items-center mb-2">
+                                        <div
+                                            class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-primary mr-3">
+                                            <i class="fas fa-weight-hanging"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-neutral-500">Capacité disponible</p>
+                                            <p class="font-bold text-neutral-900 text-lg">10 kg</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-neutral-500 mt-2 pl-13">Peut prendre plusieurs petits colis
+                                    </p>
+                                </div>
+
+                                <div class="p-4 bg-neutral-50 rounded-lg border border-neutral-100">
+                                    <div class="flex items-center mb-2">
+                                        <div
+                                            class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-3">
+                                            <i class="fas fa-tag"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-neutral-500">Prix demandé</p>
+                                            <p class="font-bold text-neutral-900 text-lg">Gratuit / Solidarité</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-neutral-500 mt-2 pl-13">Contre service ou symbolique</p>
+                                </div>
+                            </div>
+
+                            <div class="mb-8">
+                                <h3 class="font-medium text-neutral-900 mb-3">Objets acceptés</h3>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-sm"><i
+                                            class="fas fa-check text-green-500 mr-1"></i> Documents</span>
+                                    <span class="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-sm"><i
+                                            class="fas fa-check text-green-500 mr-1"></i> Vêtements</span>
+                                    <span class="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-sm"><i
+                                            class="fas fa-check text-green-500 mr-1"></i> Médicaments</span>
+                                    <span class="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-sm"><i
+                                            class="fas fa-check text-green-500 mr-1"></i> Petits appareils</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <h3 class="font-medium text-neutral-900 mb-3">Description du voyageur</h3>
+                                <div
+                                    class="bg-neutral-50 p-4 rounded-lg text-neutral-600 leading-relaxed italic border-l-4 border-primary">
+                                    "Bonjour à tous ! Je rentre à Tunis pour voir ma famille. J'ai deux valises et il me
+                                    reste pas mal de place dans l'une d'elles. N'hésitez pas si vous avez des documents
+                                    urgents ou des petits cadeaux à envoyer. Je peux récupérer les objets sur Paris
+                                    centre ou à l'aéroport CDG."
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Carte (Visuel) -->
+                    <div
+                        class="bg-white rounded-lg shadow-sm border border-neutral-200 p-1 overflow-hidden h-64 relative group cursor-pointer">
+                        <div class="absolute inset-0 bg-neutral-200 flex items-center justify-center">
+                            <span class="text-neutral-500"><i
+                                    class="fas fa-map-marked-alt text-4xl mb-2 block text-center"></i>Voir le trajet sur
+                                la carte</span>
+                        </div>
+                        <!-- Placeholder pour carte interactive -->
+                    </div>
+                </div>
+
+                <!-- Panneau d'action (Droite) -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 sticky top-24">
+                        <h2 class="text-lg font-bold text-neutral-900 mb-4">Intéressé par ce trajet ?</h2>
+                        <div class="space-y-4">
+                            <button
+                                class="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary-hover transition-all shadow-md transform hover:-translate-y-1">
+                                <i class="fas fa-paper-plane mr-2"></i> Contacter Karim
+                            </button>
+                            <button
+                                class="w-full py-3 bg-white border border-neutral-300 text-neutral-700 rounded-lg hover:bg-neutral-50 transition-colors">
+                                <i class="far fa-heart mr-2"></i> Sauvegarder
+                            </button>
+                            <button
+                                class="w-full py-3 bg-white border border-neutral-300 text-neutral-700 rounded-lg hover:bg-neutral-50 transition-colors">
+                                <i class="fas fa-share-alt mr-2"></i> Partager
+                            </button>
+                        </div>
+
+                        <div class="mt-6 pt-6 border-t border-neutral-100">
+                            <div class="flex items-start">
+                                <i class="fas fa-shield-alt text-green-600 mt-1 mr-3"></i>
+                                <div>
+                                    <h4 class="font-bold text-sm text-neutral-900">Confiance et Sécurité</h4>
+                                    <p class="text-xs text-neutral-500 mt-1">Profil vérifié, email et téléphone
+                                        confirmés. Échanges sécurisés via Jibli.tn.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-neutral-900 text-white py-12 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <img src="../assets/logos/Jibli.tn.png" alt="Jibli.tn"
+                            class="h-10 w-auto object-contain bg-white rounded p-1">
+                    </div>
+                    <p class="text-neutral-400">
+                        La plateforme peer-to-peer qui connecte la diaspora tunisienne avec la Tunisie.
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Navigation</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors"
+                                onclick="navigateTo('home')">Accueil</a></li>
+                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors">Recherche</a></li>
+                        <li><a href="#" class="text-white hover:text-white transition-colors">Voyages</a></li>
+                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors"
+                                onclick="navigateTo('demandes')">Demandes</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Légal</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors">Conditions
+                                d'utilisation</a></li>
+                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors">Politique de
+                                confidentialité</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Contact</h3>
+                    <ul class="space-y-2">
+                        <li class="text-neutral-400">contact@jibli.tn</li>
+                        <li class="text-neutral-400">Support technique</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-neutral-800 mt-8 pt-8 text-center text-neutral-400">
+                <p>&copy; 2024 Jibli.tn - Tous droits réservés</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+        // Custom logic for this page can go here or be extracted
+    </script>
+</body>
+
+</html>

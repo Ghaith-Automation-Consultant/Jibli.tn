@@ -1,0 +1,98 @@
+{
+    "trips": [
+        {
+            "from": "CRUD",
+            "to": "Test",
+            "departureDate": "2024-01-01",
+            "maxWeight": 10,
+            "userId": 1,
+            "userName": "Admin",
+            "id": 1768645409847
+        },
+        {
+            "id": 1,
+            "from": "Paris",
+            "to": "Tunis",
+            "departureDate": "2024-03-15",
+            "arrivalDate": "2024-03-16",
+            "maxWeight": 10,
+            "size": "M",
+            "priceType": "free",
+            "price": 0,
+            "status": "active",
+            "userId": 101,
+            "userName": "Karim B.",
+            "userLocation": "Paris, France"
+        },
+        {
+            "id": 2,
+            "from": "Montréal",
+            "to": "Sfax",
+            "departureDate": "2024-03-22",
+            "arrivalDate": "2024-03-23",
+            "maxWeight": 5,
+            "size": "S",
+            "priceType": "paid",
+            "price": 15,
+            "status": "active",
+            "userId": 102,
+            "userName": "Leila M.",
+            "userLocation": "Montréal, Canada"
+        },
+        {
+            "id": 3,
+            "from": "Lyon",
+            "to": "Tunis",
+            "departureDate": "2024-04-10",
+            "arrivalDate": "2024-04-11",
+            "maxWeight": 20,
+            "size": "L",
+            "priceType": "free",
+            "price": 0,
+            "status": "active",
+            "userId": 103,
+            "userName": "Ahmed S.",
+            "userLocation": "Lyon, France"
+        }
+    ],
+    "requests": [
+        {
+            "item": "CRUD Test",
+            "location": "Tunis",
+            "id": 1768645468777
+        },
+        {
+            "id": 1,
+            "item": "Médicaments spécifiques",
+            "description": "Recherche de médicaments spécifiques non disponibles en Tunisie. Petit colis de 500g maximum.",
+            "location": "Tunis",
+            "weight": 0.5,
+            "budget": 20,
+            "status": "pending",
+            "userId": 104,
+            "userName": "Sonia T.",
+            "userLocation": "Tunis, Tunisie"
+        },
+        {
+            "id": 2,
+            "item": "Pièces électroniques",
+            "description": "Pièces pour réparer un ordinateur portable. Colis protégé de 2kg maximum.",
+            "location": "Sousse",
+            "weight": 2,
+            "budget": 50,
+            "status": "pending",
+            "userId": 105,
+            "userName": "Youssef K.",
+            "userLocation": "Sousse, Tunisie"
+        }
+    ],
+    "users": [
+        {
+            "email": "crud@test.com",
+            "name": "CRUD User",
+            "location": "Updated Location",
+            "password": "123",
+            "id": 1768645563383
+        }
+    ]
+}

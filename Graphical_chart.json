@@ -1,0 +1,79 @@
+{
+  "brand": {
+    "name": "Jibli.tn",
+    "description": "Peer-to-peer marketplace connecting Tunisians abroad with Tunisians in Tunisia",
+    "values": [
+      "trust",
+      "community",
+      "movement",
+      "simplicity",
+      "tunisian-identity"
+    ]
+  },
+  "colors": {
+    "primary": {
+      "blue": {
+        "main": "#0F4C81",
+        "hover": "#0D3B66",
+        "softBackground": "#DCEEFB"
+      }
+    },
+    "identity": {
+      "tunisianRed": {
+        "main": "#C1121F",
+        "softBackground": "#FEE2E2",
+        "usage": "branding-only"
+      }
+    },
+    "accent": {
+      "amber": {
+        "main": "#F59E0B",
+        "hover": "#D97706",
+        "softBackground": "#FEF3C7"
+      }
+    },
+    "neutral": {
+      "text": {
+        "primary": "#111827",
+        "secondary": "#6B7280",
+        "disabled": "#9CA3AF",
+        "inverse": "#F9FAFB"
+      },
+      "background": {
+        "main": "#FFFFFF",
+        "secondary": "#F9FAFB",
+        "card": "#FFFFFF",
+        "inverse": "#0B1220"
+      },
+      "border": "#E5E7EB",
+      "divider": "#D1D5DB"
+    },
+    "status": {
+      "success": "#16A34A",
+      "warning": "#F97316",
+      "error": "#DC2626",
+      "info": "#2563EB"
+    },
+    "darkMode": {
+      "background": "#0B1220",
+      "card": "#111827",
+      "border": "#1F2937",
+      "text": {
+        "primary": "#F9FAFB",
+        "secondary": "#D1D5DB"
+      },
+      "brand": {
+        "primary": "#0F4C81",
+        "accent": "#C1121F"
+      }
+    }
+  },
+  "usageRules": {
+    "primaryColor": "primary.blue.main",
+    "identityAccent": "identity.tunisianRed.main",
+    "ctaSecondary": "accent.amber.main",
+    "avoid": {
+      "errorUsingIdentityRed": true
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "jibli.tn-code",
+  "version": "1.0.0",
+  "description": "**Jibli.tn** est une plateforme communautaire connectant des voyageurs disposant d'espace libre dans leurs bagages avec des personnes souhaitant envoyer des colis (documents, médicaments, électronique, vêtements, etc.) vers une destination spécifique (ex: Paris → Tunis).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^2.2.2",
+    "cors": "^2.8.5",
+    "express": "^5.2.1"
+  }
+}

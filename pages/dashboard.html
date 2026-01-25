@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <base target="_self">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Jibli.tn</title>
+    <meta name="description" content="Gérez vos voyages et vos demandes sur Jibli.tn">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../js/tailwind.config.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="min-h-screen bg-neutral-50 font-inter">
+    <!-- Header avec navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <a href="template.html" class="flex items-center" onclick="navigateTo('home')">
+                        <img src="../assets/logos/Jibli.tn.png" alt="Jibli.tn" class="h-12 w-auto object-contain">
+                    </a>
+                </div>
+
+                <!-- Navigation principale -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="template.html" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                        onclick="navigateTo('home')">Accueil</a>
+                    <a href="#" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                        onclick="navigateTo('voyages')">Voyages</a>
+                    <a href="#" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                        onclick="navigateTo('demandes')">Demandes</a>
+                    <a href="#" class="text-primary font-bold transition-colors"
+                        onclick="navigateTo('dashboard')">Dashboard</a>
+                </div>
+
+                <!-- Actions utilisateur -->
+                <div class="flex items-center space-x-4">
+                    <!-- Avatar utilisateur connecté -->
+                    <div id="userMenu" class="block">
+                        <button id="userMenuBtn" class="flex items-center space-x-2">
+                            <div class="w-10 h-10 bg-neutral-200 rounded-full overflow-hidden">
+                                <img src="https://picsum.photos/40?random=100" alt="Photo de profil"
+                                    class="w-full h-full object-cover">
+                            </div>
+                            <span class="text-neutral-500 font-medium hidden md:inline">Mohamed</span>
+                            <i class="fas fa-chevron-down text-xs text-neutral-500 hidden md:inline"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="py-12">
+        <div class="container mx-auto px-4">
+            <h1 class="text-3xl font-bold text-neutral-900 mb-8">Mon Tableau de Bord</h1>
+
+            <!-- Tabs -->
+            <div class="flex border-b border-neutral-200 mb-8">
+                <button id="tabMyTrips" onclick="switchDashboardTab('trips')"
+                    class="px-6 py-3 font-bold text-primary border-b-2 border-primary hover:bg-neutral-50 transition-colors">
+                    <i class="fas fa-plane-departure mr-2"></i> Mes Voyages
+                </button>
+                <button id="tabMyRequests" onclick="switchDashboardTab('requests')"
+                    class="px-6 py-3 font-medium text-neutral-500 hover:text-primary hover:bg-neutral-50 transition-colors">
+                    <i class="fas fa-box mr-2"></i> Mes Demandes
+                </button>
+            </div>
+
+            <!-- Content -->
+            <div id="myTripsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Trip Cards will be injected here -->
+                <p class="col-span-full text-center text-neutral-500 py-12">Chargement de vos voyages...</p>
+            </div>
+
+            <div id="myRequestsContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Request Cards will be injected here -->
+                <p class="col-span-full text-center text-neutral-500 py-12">Chargement de vos demandes...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-neutral-900 text-white py-12 mt-auto">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4"><img src="../assets/logos/Jibli.tn.png" alt="Jibli.tn"
+                            class="h-10 w-auto object-contain bg-white rounded p-1"></div>
+                    <p class="text-neutral-400">
+                        La plateforme peer-to-peer qui connecte la diaspora tunisienne avec la Tunisie.
+                    </p>
+                </div>
+            </div>
+            <div class="border-t border-neutral-800 mt-8 pt-8 text-center text-neutral-400">
+                <p>&copy; 2024 Jibli.tn - Tous droits réservés</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modals (Reused from template) -->
+    <!-- Modal Publier un voyage (Used for Edit too) -->
+    <div id="createTripModal"
+        class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-lg max-w-2xl w-full p-6 my-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="tripModalTitle" class="text-2xl font-bold text-neutral-900">Publier un voyage</h3>
+                <button onclick="closeCreateTripModal()" class="text-neutral-500 hover:text-neutral-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="tripForm" onsubmit="handleCreateTrip(event)">
+                <input type="hidden" id="editTripId">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-neutral-500 mb-2">Ville de départ *</label>
+                        <input type="text" id="tripFrom" required
+                            class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                    </div>
+                    <div>
+                        <label class="block text-neutral-500 mb-2">Ville d'arrivée *</label>
+                        <input type="text" id="tripTo" required
+                            class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-neutral-500 mb-2">Date de départ *</label>
+                        <input type="date" id="tripDate" required
+                            class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                    </div>
+                    <div>
+                        <label class="block text-neutral-500 mb-2">Date d'arrivée estimée *</label>
+                        <input type="date" id="tripArrivalDate" required
+                            class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-neutral-500 mb-2">Capacité disponible</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-neutral-500 mb-2">Poids maximum (kg) *</label>
+                            <input type="number" id="tripWeight" required min="0" step="0.5"
+                                class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                        </div>
+                        <div>
+                            <label class="block text-neutral-500 mb-2">Taille *</label>
+                            <select id="tripSize"
+                                class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                                <option value="S">Petit (S)</option>
+                                <option value="M">Moyen (M)</option>
+                                <option value="L">Grand (L)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-neutral-500 mb-2">Conditions</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="radio" name="priceType" value="free" checked class="mr-2">
+                            <span>Gratuit</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="priceType" value="paid" class="mr-2">
+                            <span>Payant</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="priceField" class="mb-6 hidden">
+                    <label class="block text-neutral-500 mb-2">Prix (optionnel)</label>
+                    <input type="number" id="tripPrice" min="0" step="0.01"
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary"
+                        placeholder="Ex: 10.50">
+                </div>
+
+                <div class="mb-6">
+                    <button type="submit" id="tripSubmitBtn"
+                        class="w-full py-3 bg-primary text-white rounded-md hover:bg-primary-hover transition-colors">
+                        Publier le voyage
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Faire une demande (Used for Edit) -->
+    <div id="createRequestModal"
+        class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-lg max-w-2xl w-full p-6 my-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="requestModalTitle" class="text-2xl font-bold text-neutral-900">Faire une demande</h3>
+                <button onclick="closeCreateRequestModal()" class="text-neutral-500 hover:text-neutral-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="requestForm" onsubmit="handleCreateRequest(event)">
+                <input type="hidden" id="editRequestId">
+                <div class="mb-4">
+                    <label class="block text-neutral-500 mb-2">Objet demandé *</label>
+                    <input type="text" id="requestItem" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary"
+                        placeholder="Ex: Médicaments spécifiques">
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-neutral-500 mb-2">Description détaillée *</label>
+                    <textarea id="requestDesc" rows="4" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary"
+                        placeholder="Décrivez ce que vous recherchez..."></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-neutral-500 mb-2">Ville de réception *</label>
+                        <input type="text" id="requestLoc" required
+                            class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                    </div>
+                    <div>
+                        <label class="block text-neutral-500 mb-2">Date limite</label>
+                        <input type="date" id="requestDate"
+                            class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-neutral-500 mb-2">Poids estimé (kg)</label>
+                        <input type="number" id="requestWeight" min="0" step="0.1"
+                            class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                    </div>
+                    <div>
+                        <label class="block text-neutral-500 mb-2">Budget proposé (€)</label>
+                        <input type="number" id="requestBudget" min="0" step="0.01"
+                            class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <button type="submit" id="requestSubmitBtn"
+                        class="w-full py-3 bg-primary text-white rounded-md hover:bg-primary-hover transition-colors">
+                        Publier la demande
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/data.js"></script>
+    <script src="../js/render.js"></script>
+    <script src="../js/main.js"></script>
+    <script src="../js/dashboard.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <base target="_self">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recherche - Jibli.tn</title>
+    <meta name="description"
+        content="Recherchez des voyages et des demandes sur Jibli.tn - Trouvez ce que vous cherchez ou proposez vos services">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../js/tailwind.config.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+</head>
+
+<body class="min-h-screen bg-gray-50 font-inter">
+    <!-- Header avec navigation -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                        <span class="text-white font-bold text-xl">ج</span>
+                    </div>
+                    <a href="#" class="text-2xl font-bold text-neutral-900" onclick="navigateTo('home')">
+                        <span class="text-primary">Jibli</span>.tn
+                    </a>
+                </div>
+
+                <!-- Navigation principale -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="#" class="text-gray-700 hover:text-primary font-medium transition-colors"
+                        onclick="navigateTo('home')">Accueil</a>
+                    <a href="#" class="text-primary font-medium border-b-2 border-primary pb-1">Recherche</a>
+                    <a href="#" class="text-gray-700 hover:text-primary font-medium transition-colors"
+                        onclick="navigateTo('voyages')">Voyages</a>
+                    <a href="#" class="text-gray-700 hover:text-primary font-medium transition-colors"
+                        onclick="navigateTo('demandes')">Demandes</a>
+                    <a href="#" class="text-gray-700 hover:text-primary font-medium transition-colors"
+                        onclick="navigateTo('dashboard')">Dashboard</a>
+                </div>
+
+                <!-- Actions utilisateur -->
+                <div class="flex items-center space-x-4">
+                    <!-- Avatar utilisateur -->
+                    <div class="relative">
+                        <button id="userMenuBtn" class="flex items-center space-x-2">
+                            <div class="w-10 h-10 bg-gray-300 rounded-full overflow-hidden">
+                                <img src="https://picsum.photos/40?random=200" alt="Photo de profil"
+                                    class="w-full h-full object-cover">
+                            </div>
+                            <span class="text-gray-700 font-medium hidden md:inline">Mohamed</span>
+                            <i class="fas fa-chevron-down text-xs text-gray-500 hidden md:inline"></i>
+                        </button>
+                        <div id="userDropdown"
+                            class="absolute hidden mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 right-0">
+                            <a href="#" class="block px-4 py-3 hover:bg-gray-100 transition-colors"
+                                onclick="navigateTo('dashboard')">
+                                <i class="fas fa-tachometer-alt mr-2 text-gray-500"></i>
+                                Dashboard
+                            </a>
+                            <a href="#" class="block px-4 py-3 hover:bg-gray-100 transition-colors"
+                                onclick="navigateTo('profile')">
+                                <i class="fas fa-user mr-2 text-gray-500"></i>
+                                Mon profil
+                            </a>
+                            <a href="#" class="block px-4 py-3 hover:bg-gray-100 transition-colors"
+                                onclick="navigateTo('messages')">
+                                <i class="fas fa-envelope mr-2 text-gray-500"></i>
+                                Messages
+                            </a>
+                            <hr class="border-gray-200">
+                            <button onclick="logout()"
+                                class="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 transition-colors">
+                                <i class="fas fa-sign-out-alt mr-2"></i>
+                                Déconnexion
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menu mobile -->
+                <button id="mobileMenuBtn" class="md:hidden text-gray-700">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Menu mobile dropdown -->
+            <div id="mobileMenu" class="hidden md:hidden mt-4 pt-4 border-t border-gray-200">
+                <div class="flex flex-col space-y-3">
+                    <a href="#" class="text-gray-700 hover:text-primary py-2" onclick="navigateTo('home')">Accueil</a>
+                    <a href="#" class="text-primary py-2 font-medium">Recherche</a>
+                    <a href="#" class="text-gray-700 hover:text-primary py-2"
+                        onclick="navigateTo('voyages')">Voyages</a>
+                    <a href="#" class="text-gray-700 hover:text-primary py-2"
+                        onclick="navigateTo('demandes')">Demandes</a>
+                    <a href="#" class="text-gray-700 hover:text-primary py-2"
+                        onclick="navigateTo('dashboard')">Dashboard</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Barre de recherche principale -->
+        <section class="bg-gradient-to-r from-primary to-blue-700 py-8 md:py-12">
+            <div class="container mx-auto px-4">
+                <div class="max-w-6xl mx-auto">
+                    <h1 class="text-3xl md:text-4xl font-bold text-white mb-4">
+                        Trouvez ce que vous cherchez
+                    </h1>
+                    <p class="text-white opacity-90 mb-8">
+                        Recherchez des voyages ou des demandes selon vos critères
+                    </p>
+
+                    <!-- Onglets de recherche -->
+                    <div class="flex mb-6">
+                        <button id="searchTripsTab" class="px-6 py-3 bg-white text-primary font-bold rounded-t-lg">
+                            <i class="fas fa-plane-departure mr-2"></i>
+                            Rechercher un voyage
+                        </button>
+                        <button id="searchRequestsTab"
+                            class="px-6 py-3 bg-gray-800 text-white font-bold rounded-t-lg ml-2">
+                            <i class="fas fa-box mr-2"></i>
+                            Rechercher une demande
+                        </button>
+                    </div>
+
+                    <!-- Formulaire de recherche voyages -->
+                    <div id="tripsSearchForm" class="bg-white rounded-lg p-6 shadow-lg">
+                        <form id="searchTripsForm" onsubmit="handleSearchTrips(event)">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Départ</label>
+                                    <div class="relative">
+                                        <i class="fas fa-map-marker-alt absolute left-3 top-3 text-gray-400"></i>
+                                        <input type="text" placeholder="Ville ou pays"
+                                            class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Arrivée</label>
+                                    <div class="relative">
+                                        <i class="fas fa-map-marker-alt absolute left-3 top-3 text-gray-400"></i>
+                                        <input type="text" placeholder="Ville ou pays"
+                                            class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Date de départ</label>
+                                    <div class="relative">
+                                        <i class="fas fa-calendar-alt absolute left-3 top-3 text-gray-400"></i>
+                                        <input type="date"
+                                            class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Type</label>
+                                    <div class="relative">
+                                        <i class="fas fa-tag absolute left-3 top-3 text-gray-400"></i>
+                                        <select
+                                            class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+                                            <option value="">Tous les types</option>
+                                            <option value="free">Gratuit</option>
+                                            <option value="paid">Payant</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <button type="button" onclick="toggleAdvancedFilters()"
+                                    class="text-primary hover:underline">
+                                    <i class="fas fa-filter mr-1"></i>
+                                    Filtres avancés
+                                </button>
+                                <button type="submit"
+                                    class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors">
+                                    <i class="fas fa-search mr-2"></i>
+                                    Rechercher
+                                </button>
+                            </div>
+
+                            <!-- Filtres avancés -->
+                            <div id="advancedFilters" class="mt-6 p-4 bg-gray-50 rounded-lg hidden">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-gray-700 text-sm font-medium mb-2">Poids maximum
+                                            (kg)</label>
+                                        <input type="number" min="0" step="0.5" placeholder="Ex: 10"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 text-sm font-medium mb-2">Taille du
+                                            colis</label>
+                                        <select
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+                                            <option value="">Toutes les tailles</option>
+                                            <option value="S">Petit (S)</option>
+                                            <option value="M">Moyen (M)</option>
+                                            <option value="L">Grand (L)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 text-sm font-medium mb-2">Prix maximum
+                                            (€)</label>
+                                        <input type="number" min="0" step="0.01" placeholder="Ex: 50"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Types d'objets
+                                        acceptés</label>
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="filter-checkbox mr-2 relative">
+                                            <span class="text-sm">Documents</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="filter-checkbox mr-2 relative">
+                                            <span class="text-sm">Médicaments</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="filter-checkbox mr-2 relative">
+                                            <span class="text-sm">Électronique</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="filter-checkbox mr-2 relative">
+                                            <span class="text-sm">Vêtements</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Formulaire de recherche demandes -->
+                    <div id="requestsSearchForm" class="bg-white rounded-lg p-6 shadow-lg hidden">
+                        <form id="searchRequestsForm" onsubmit="handleSearchRequests(event)">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Objet recherché</label>
+                                    <div class="relative">
+                                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                        <input type="text" placeholder="Ex: Médicaments, pièces électroniques..."
+                                            class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Destination</label>
+                                    <div class="relative">
+                                        <i class="fas fa-map-marker-alt absolute left-3 top-3 text-gray-400"></i>
+                                        <input type="text" placeholder="Ville ou région"
+                                            class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Date limite</label>
+                                    <div class="relative">
+                                        <i class="fas fa-calendar-alt absolute left-3 top-3 text-gray-400"></i>
+                                        <input type="date"
+                                            class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <button type="button" onclick="toggleAdvancedFiltersRequests()"
+                                    class="text-primary hover:underline">
+                                    <i class="fas fa-filter mr-1"></i>
+                                    Filtres avancés
+                                </button>
+                                <button type="submit"
+                                    class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors">
+                                    <i class="fas fa-search mr-2"></i>
+                                    Rechercher
+                                </button>
+                            </div>
+
+                            <!-- Filtres avancés demandes -->
+                            <div id="advancedFiltersRequests" class="mt-6 p-4 bg-gray-50 rounded-lg hidden">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-gray-700 text-sm font-medium mb-2">Budget maximum
+                                            (€)</label>
+                                        <input type="number" min="0" step="0.01" placeholder="Ex: 100"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 text-sm font-medium mb-2">Poids maximum
+                                            (kg)</label>
+                                        <input type="number" min="0" step="0.5" placeholder="Ex: 5"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 text-sm font-medium mb-2">Statut</label>
+                                        <select
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary">
+                                            <option value="">Tous les statuts</option>
+                                            <option value="pending">En attente</option>
+                                            <option value="active">Actif</option>
+                                            <option value="completed">Terminé</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <label class="block text-gray-700 text-sm font-medium mb-2">Catégories</label>
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="filter-checkbox mr-2 relative">
+                                            <span class="text-sm">Médicaments</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="filter-checkbox mr-2 relative">
+                                            <span class="text-sm">Électronique</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="filter-checkbox mr-2 relative">
+                                            <span class="text-sm">Documents</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="checkbox" class="filter-checkbox mr-2 relative">
+                                            <span class="text-sm">Nourriture</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Résultats de recherche -->
+        <section class="py-8">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <!-- Filtres latéraux -->
+                    <div class="lg:w-1/4">
+                        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                            <h3 class="text-lg font-bold text-dark mb-4">Filtres</h3>
+
+                            <!-- Filtre par date -->
+                            <div class="mb-6">
+                                <h4 class="font-medium text-gray-700 mb-3">Date de départ</h4>
+                                <div class="space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="radio" name="dateFilter" value="any" checked class="mr-2">
+                                        <span class="text-sm">Toutes dates</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="radio" name="dateFilter" value="week" class="mr-2">
+                                        <span class="text-sm">Cette semaine</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="radio" name="dateFilter" value="month" class="mr-2">
+                                        <span class="text-sm">Ce mois</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="radio" name="dateFilter" value="next3months" class="mr-2">
+                                        <span class="text-sm">3 prochains mois</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Filtre par prix -->
+                            <div class="mb-6">
+                                <h4 class="font-medium text-gray-700 mb-3">Prix</h4>
+                                <div class="space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="radio" name="priceFilter" value="any" checked class="mr-2">
+                                        <span class="text-sm">Tous les prix</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="radio" name="priceFilter" value="free" class="mr-2">
+                                        <span class="text-sm">Gratuit uniquement</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="radio" name="priceFilter" value="paid" class="mr-2">
+                                        <span class="text-sm">Payant uniquement</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Filtre par capacité -->
+                            <div class="mb-6">
+                                <h4 class="font-medium text-gray-700 mb-3">Capacité disponible</h4>
+                                <div class="space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="filter-checkbox mr-2 relative">
+                                        <span class="text-sm">Moins de 5kg</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="filter-checkbox mr-2 relative">
+                                        <span class="text-sm">5-10kg</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="filter-checkbox mr-2 relative">
+                                        <span class="text-sm">Plus de 10kg</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Filtre par type d'objet -->
+                            <div class="mb-6">
+                                <h4 class="font-medium text-gray-700 mb-3">Type d'objet</h4>
+                                <div class="space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="filter-checkbox mr-2 relative">
+                                        <span class="text-sm">Documents</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="filter-checkbox mr-2 relative">
+                                        <span class="text-sm">Médicaments</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="filter-checkbox mr-2 relative">
+                                        <span class="text-sm">Électronique</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="filter-checkbox mr-2 relative">
+                                        <span class="text-sm">Vêtements</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="filter-checkbox mr-2 relative">
+                                        <span class="text-sm">Nourriture</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <button onclick="applyFilters()"
+                                class="w-full py-2 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors">
+                                Appliquer les filtres
+                            </button>
+                        </div>
+
+                        <!-- Carte interactive -->
+                        <div class="bg-white rounded-lg shadow-sm p-6">
+                            <h3 class="text-lg font-bold text-dark mb-4">Carte des voyages</h3>
+                            <div class="map-container rounded-lg overflow-hidden">
+                                <!-- Carte simulée -->
+                                <div class="h-full flex items-center justify-center">
+                                    <div class="text-center text-white">
+                                        <i class="fas fa-map-marked-alt text-4xl mb-4"></i>
+                                        <p class="text-lg font-medium">Carte interactive</p>
+                                        <p class="text-sm opacity-90">Visualisez les voyages sur la carte</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4 text-center">
+                                <button onclick="showMapView()" class="text-primary hover:underline text-sm">
+                                    <i class="fas fa-expand mr-1"></i>
+                                    Voir en plein écran
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Résultats -->
+                    <div class="lg:w-3/4">
+                        <!-- En-tête résultats -->
+                        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+                                <div>
+                                    <h2 class="text-2xl font-bold text-dark mb-2">Résultats de recherche</h2>
+                                    <p class="text-gray-600">12 voyages trouvés pour "Paris → Tunis"</p>
+                                </div>
+                                <div class="flex items-center space-x-4 mt-4 md:mt-0">
+                                    <div class="flex items-center">
+                                        <span class="text-gray-700 mr-2">Trier par:</span>
+                                        <select
+                                            class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-primary">
+                                            <option>Pertinence</option>
+                                            <option>Date (plus récent)</option>
+                                            <option>Date (plus ancien)</option>
+                                            <option>Prix (croissant)</option>
+                                            <option>Prix (décroissant)</option>
+                                            <option>Capacité disponible</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex">
+                                        <button id="listViewBtn"
+                                            class="p-2 border border-gray-300 rounded-l-lg bg-white">
+                                            <i class="fas fa-list"></i>
+                                        </button>
+                                        <button id="gridViewBtn"
+                                            class="p-2 border border-gray-300 border-l-0 rounded-r-lg bg-gray-100">
+                                            <i class="fas fa-th-large"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Statistiques -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                <div class="bg-blue-50 p-4 rounded-lg">
+                                    <div class="flex items-center">
+                                        <div
+                                            class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                                            <i class="fas fa-plane text-blue-600"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-600">Voyages actifs</p>
+                                            <p class="text-2xl font-bold text-dark">47</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-green-50 p-4 rounded-lg">
+                                    <div class="flex items-center">
+                                        <div
+                                            class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                                            <i class="fas fa-users text-green-600"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-600">Voyageurs actifs</p>
+                                            <p class="text-2xl font-bold text-dark">128</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-yellow-50 p-4 rounded-lg">
+                                    <div class="flex items-center">
+                                        <div
+                                            class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
+                                            <i class="fas fa-check-circle text-yellow-600"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm text-gray-600">Transactions réussies</p>
+                                            <p class="text-2xl font-bold text-dark">892</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Liste des résultats -->
+                        <div id="searchResults" class="space-y-6">
+                            <!-- Dynamic content loaded by JS -->
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="mt-8 bg-white rounded-lg shadow-sm p-6">
+                            <div class="flex justify-between items-center">
+                                <div class="text-gray-600">
+                                    Affichage <span class="font-bold">1-3</span> sur <span class="font-bold">12</span>
+                                    résultats
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button
+                                        class="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-100">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </button>
+                                    <button
+                                        class="w-10 h-10 flex items-center justify-center bg-primary text-white rounded-lg">1</button>
+                                    <button
+                                        class="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-100">2</button>
+                                    <button
+                                        class="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-100">3</button>
+                                    <button
+                                        class="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-100">4</button>
+                                    <button
+                                        class="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-lg hover:bg-gray-100">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section d'aide -->
+        <section class="py-12 bg-secondary">
+            <div class="container mx-auto px-4">
+                <div class="max-w-4xl mx-auto text-center">
+                    <h2 class="text-3xl font-bold text-dark mb-6">Besoin d'aide pour votre recherche ?</h2>
+                    <p class="text-gray-600 mb-8">
+                        Notre équipe est là pour vous aider à trouver le voyageur parfait ou la demande qui correspond à
+                        vos besoins.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-lg shadow-sm">
+                            <div
+                                class="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-search text-white text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3">Recherche avancée</h3>
+                            <p class="text-gray-600">Utilisez nos filtres avancés pour trouver exactement ce que vous
+                                cherchez.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-sm">
+                            <div
+                                class="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-bell text-white text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3">Alertes personnalisées</h3>
+                            <p class="text-gray-600">Créez des alertes pour être notifié des nouveaux voyages
+                                correspondant à vos critères.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-sm">
+                            <div
+                                class="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-headset text-white text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-3">Support 24/7</h3>
+                            <p class="text-gray-600">Notre équipe de support est disponible pour répondre à toutes vos
+                                questions.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <img src="../assets/logos/Jibli.tn.png" alt="Jibli.tn"
+                            class="h-10 w-auto object-contain bg-white rounded p-1">
+                    </div>
+                    <p class="text-gray-400">
+                        La plateforme peer-to-peer qui connecte la diaspora tunisienne avec la Tunisie.
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Navigation</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors"
+                                onclick="navigateTo('home')">Accueil</a></li>
+                        <li><a href="#" class="text-white hover:text-white transition-colors">Recherche</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors"
+                                onclick="navigateTo('voyages')">Voyages</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors"
+                                onclick="navigateTo('demandes')">Demandes</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Légal</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors"
+                                onclick="navigateTo('conditions')">Conditions d'utilisation</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors"
+                                onclick="navigateTo('confidentialite')">Politique de confidentialité</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors"
+                                onclick="navigateTo('securite')">Sécurité</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold mb-4">Contact</h3>
+                    <ul class="space-y-2">
+                        <li class="text-gray-400">contact@jibli.tn</li>
+                        <li class="text-gray-400">Support technique</li>
+                        <li class="text-gray-400">Signalement</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 Jibli.tn - Tous droits réservés</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/render.js"></script>
+    <script src="../js/recherche.js"></script>
+    <script src="../js/main.js"></script>
+</body>
+
+</html>
