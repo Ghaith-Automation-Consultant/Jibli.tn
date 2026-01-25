@@ -55,6 +55,28 @@ const JibliData = {
         }
     },
 
+    // Token Management
+    getToken() {
+        return localStorage.getItem('jibli_token');
+    },
+
+    setToken(token) {
+        localStorage.setItem('jibli_token', token);
+    },
+
+    clearToken() {
+        localStorage.removeItem('jibli_token');
+    },
+
+    getAuthHeaders() {
+        const headers = { 'Content-Type': 'application/json' };
+        const token = this.getToken();
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+        return headers;
+    },
+
     // API Methods
     async fetchData() {
         try {
@@ -80,8 +102,16 @@ const JibliData = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
         });
-        if (!res.ok) throw new Error('Login failed');
-        return await res.json();
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.error || 'Login failed');
+        }
+        const data = await res.json();
+        // Store JWT token
+        if (data.user && data.user.token) {
+            this.setToken(data.user.token);
+        }
+        return data;
     },
 
     async register(userData) {
@@ -90,14 +120,26 @@ const JibliData = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(userData)
         });
-        if (!res.ok) throw new Error('Registration failed');
-        return await res.json();
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.error || 'Registration failed');
+        }
+        const data = await res.json();
+        // Store JWT token
+        if (data.user && data.user.token) {
+            this.setToken(data.user.token);
+        }
+        return data;
+    },
+
+    logout() {
+        this.clearToken();
     },
 
     async createTrip(tripData) {
         const res = await fetch('/api/trips', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: this.getAuthHeaders(),
             body: JSON.stringify(tripData)
         });
         if (!res.ok) throw new Error('Failed to create trip');
@@ -109,7 +151,7 @@ const JibliData = {
     async createRequest(requestData) {
         const res = await fetch('/api/requests', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: this.getAuthHeaders(),
             body: JSON.stringify(requestData)
         });
         if (!res.ok) throw new Error('Failed to create request');
@@ -121,7 +163,7 @@ const JibliData = {
     async updateTrip(id, updates) {
         const res = await fetch(`/api/trips/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: this.getAuthHeaders(),
             body: JSON.stringify(updates)
         });
         if (!res.ok) throw new Error('Failed to update trip');
@@ -133,7 +175,10 @@ const JibliData = {
     },
 
     async deleteTrip(id) {
-        const res = await fetch(`/api/trips/${id}`, { method: 'DELETE' });
+        const res = await fetch(`/api/trips/${id}`, {
+            method: 'DELETE',
+            headers: this.getAuthHeaders()
+        });
         if (!res.ok) throw new Error('Failed to delete trip');
         // Update local state
         this.trips = this.trips.filter(t => t.id != id);
@@ -143,7 +188,7 @@ const JibliData = {
     async updateRequest(id, updates) {
         const res = await fetch(`/api/requests/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: this.getAuthHeaders(),
             body: JSON.stringify(updates)
         });
         if (!res.ok) throw new Error('Failed to update request');
@@ -155,7 +200,10 @@ const JibliData = {
     },
 
     async deleteRequest(id) {
-        const res = await fetch(`/api/requests/${id}`, { method: 'DELETE' });
+        const res = await fetch(`/api/requests/${id}`, {
+            method: 'DELETE',
+            headers: this.getAuthHeaders()
+        });
         if (!res.ok) throw new Error('Failed to delete request');
         // Update local state
         this.requests = this.requests.filter(r => r.id != id);
@@ -165,7 +213,7 @@ const JibliData = {
     async updateUser(id, updates) {
         const res = await fetch(`/api/users/${id}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: this.getAuthHeaders(),
             body: JSON.stringify(updates)
         });
         if (!res.ok) throw new Error('Failed to update user');

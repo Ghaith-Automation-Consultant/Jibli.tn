@@ -1,6 +1,36 @@
 {
     "trips": [
         {
+            "from": "Paris",
+            "to": "Tunis",
+            "departureDate": "2024-06-01",
+            "maxWeight": 10,
+            "id": 1769382806146
+        },
+        {
+            "from": "Marseille",
+            "to": "Tunis",
+            "departureDate": "2024-08-01",
+            "maxWeight": 15,
+            "id": 1769382805715
+        },
+        {
+            "from": "Lyon",
+            "to": "Tunis",
+            "departureDate": "2024-07-01",
+            "maxWeight": 5,
+            "id": 1769382805690
+        },
+        {
+            "from": "Paris",
+            "to": "Tunis",
+            "departureDate": "2024-06-01",
+            "maxWeight": 10,
+            "size": "M",
+            "priceType": "free",
+            "id": 1769382805663
+        },
+        {
             "from": "CRUD",
             "to": "Test",
             "departureDate": "2024-01-01",
@@ -57,6 +87,28 @@
     ],
     "requests": [
         {
+            "item": "Vêtements",
+            "location": "Sfax",
+            "weight": 1,
+            "budget": 15,
+            "id": 1769382805721
+        },
+        {
+            "item": "Électronique",
+            "location": "Sousse",
+            "weight": 2,
+            "budget": 50,
+            "id": 1769382805700
+        },
+        {
+            "item": "Médicaments",
+            "description": "Médicaments spécifiques",
+            "location": "Tunis",
+            "weight": 0.5,
+            "budget": 20,
+            "id": 1769382805666
+        },
+        {
             "item": "CRUD Test",
             "location": "Tunis",
             "id": 1768645468777
@@ -87,6 +139,48 @@
         }
     ],
     "users": [
+        {
+            "email": "fullflow-1769382805986@test.com",
+            "name": "Full Flow User",
+            "location": "Tunis, Tunisie",
+            "password": "$2b$10$AM8wcUrDFuUV8HDi/hm0M.d5vSNRFIFP2oThfQ.YQn4QQvcE0clJG",
+            "id": 1769382806064
+        },
+        {
+            "email": "login-1769382805752@test.com",
+            "name": "Login Test User",
+            "location": "Tunis, Tunisie",
+            "password": "$2b$10$dSdRR4wpKRK9V/.zrPkpMOtXdaW4NuOKaLvXncSsncxDb46/uPSHW",
+            "id": 1769382805825
+        },
+        {
+            "email": "duplicate-1769382805644@test.com",
+            "name": "First User",
+            "location": "Tunis, Tunisie",
+            "password": "$2b$10$BHzNp/JXbrJAM06H7KQHR.A4VSlbNU8d8xOKgaJ73tQIsJaBzD5ce",
+            "id": 1769382805722
+        },
+        {
+            "email": "integration-1769382805524@test.com",
+            "name": "Integration Test User",
+            "location": "Tunis, Tunisie",
+            "password": "$2b$10$YGkE.EmU65wBpXGehf3VjOhEZSVQSLcaLukiF9wscgnPgv0MaZeVi",
+            "id": 1769382805629
+        },
+        {
+            "email": "requesttest-1769382805523@example.com",
+            "name": "Request Test User",
+            "location": "Tunis, Tunisie",
+            "password": "$2b$10$mmfGLwVMUbwIZ8i6qzTejevvRtrm7tyxnArGgM1tVaiHuW.I5YXHi",
+            "id": 1769382805628
+        },
+        {
+            "email": "triptest-1769382805523@example.com",
+            "name": "Trip Test User",
+            "location": "Tunis, Tunisie",
+            "password": "$2b$10$tATt3kR1X/gk1i14OZcUmOVgpTA.ID0MhC.tIP0CIPxjVGwGFdC06",
+            "id": 1769382805626
+        },
         {
             "email": "crud@test.com",
             "name": "CRUD User",
