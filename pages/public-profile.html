@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Public - Jibli.tn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0D9488',
+                        neutral: { 50: '#F8FAFC', 900: '#0F172A' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-neutral-50 text-neutral-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="index.html" class="flex items-center gap-2 font-bold text-xl text-primary">Jibli.tn</a>
+            <div class="flex items-center gap-4">
+                <a href="recherche.html" class="text-neutral-500 hover:text-primary">Retour à la recherche</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-8 max-w-5xl flex-grow">
+        <!-- Header Profil Public -->
+        <div class="bg-white rounded-2xl shadow-sm border border-neutral-100 p-8 mb-8">
+            <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
+                <!-- Avatar -->
+                <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-neutral-50 shadow-lg shrink-0">
+                    <img id="publicAvatar" src="https://ui-avatars.com/api/?name=User&background=random" alt="Avatar"
+                        class="w-full h-full object-cover">
+                </div>
+
+                <!-- Infos -->
+                <div class="flex-grow text-center md:text-left">
+                    <h1 id="publicName" class="text-3xl font-bold text-neutral-900 mb-2">Chargement...</h1>
+                    <p id="publicJoinDate" class="text-neutral-500 mb-4">Membre depuis ...</p>
+
+                    <!-- Badges -->
+                    <div class="flex flex-wrap justify-center md:justify-start gap-3 mb-6">
+                        <span id="badgeEmail"
+                            class="hidden px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm"><i
+                                class="fas fa-check-circle mr-1"></i> Email Vérifié</span>
+                        <span id="badgePhone"
+                            class="hidden px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm"><i
+                                class="fas fa-check-circle mr-1"></i> Tel Vérifié</span>
+                        <span id="badgeIdentity"
+                            class="hidden px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm"><i
+                                class="fas fa-shield-alt mr-1"></i> Identité Vérifiée</span>
+                    </div>
+
+                    <!-- Stats Rapides -->
+                    <div class="flex justify-center md:justify-start gap-8 border-t border-neutral-100 pt-6">
+                        <div class="text-center">
+                            <span class="block text-2xl font-bold text-neutral-900" id="statTrips">0</span>
+                            <span class="text-xs text-neutral-500 uppercase tracking-wide">Voyages</span>
+                        </div>
+                        <div class="text-center">
+                            <span class="block text-2xl font-bold text-neutral-900" id="statReviews">0</span>
+                            <span class="text-xs text-neutral-500 uppercase tracking-wide">Avis</span>
+                        </div>
+                        <div class="text-center">
+                            <span class="block text-2xl font-bold text-yellow-500" id="statRating">-</span>
+                            <span class="text-xs text-neutral-500 uppercase tracking-wide">Note</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Sidebar: À propos -->
+            <div class="space-y-6">
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-neutral-100">
+                    <h3 class="font-bold text-lg mb-4">À propos</h3>
+                    <div class="text-neutral-600 space-y-4">
+                        <p id="publicBio" class="italic">"Aucun bio renseignée."</p>
+                        <div class="pt-4 border-t border-neutral-100">
+                            <p class="text-sm font-semibold mb-2">Langues parlées</p>
+                            <div id="publicLanguages" class="flex flex-wrap gap-2">
+                                <span class="text-sm text-neutral-500">Non spécifié</span>
+                            </div>
+                        </div>
+                        <div class="pt-4 border-t border-neutral-100">
+                            <p class="text-sm font-semibold mb-2">Ville</p>
+                            <p id="publicLocation" class="text-neutral-700">Non spécifié</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenu Principal: Avis et Activité -->
+            <div class="md:col-span-2 space-y-8">
+                <!-- Avis -->
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-neutral-100">
+                    <h3 class="font-bold text-lg mb-6">Derniers avis</h3>
+                    <div id="reviewsList" class="space-y-6">
+                        <p class="text-center text-neutral-500 py-4">Aucun avis pour le moment.</p>
+                    </div>
+                </div>
+
+                <!-- Annonces Actives -->
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-neutral-100">
+                    <h3 class="font-bold text-lg mb-6">Voyages à venir</h3>
+                    <div id="tripsList" class="grid grid-cols-1 gap-4">
+                        <p class="text-center text-neutral-500 py-4">Aucun voyage actif.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-white border-t border-neutral-200 py-8 text-center text-neutral-500">
+        &copy; 2024 Jibli.tn
+    </footer>
+
+    <script src="../js/data.js"></script>
+    <!-- Modal Connexion -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-neutral-900">Connexion</h3>
+                <button onclick="closeLoginModal()" class="text-neutral-500 hover:text-neutral-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="mb-4">
+                    <label class="block text-neutral-500 mb-2">Email</label>
+                    <input type="email" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-neutral-500 mb-2">Mot de passe</label>
+                    <input type="password" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-6">
+                    <button type="submit"
+                        class="w-full py-3 bg-primary text-white rounded-md hover:bg-primary-hover transition-colors">
+                        Se connecter
+                    </button>
+                </div>
+
+                <div class="text-center text-neutral-500">
+                    Pas encore de compte ?
+                    <button type="button" onclick="switchToRegister()"
+                        class="text-primary hover:underline font-medium">S'inscrire</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Inscription -->
+    <div id="registerModal"
+        class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-neutral-900">Inscription</h3>
+                <button onclick="closeRegisterModal()" class="text-neutral-500 hover:text-neutral-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="mb-4">
+                    <label class="block text-neutral-500 mb-2">Email</label>
+                    <input type="email" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-neutral-500 mb-2">Mot de passe</label>
+                    <input type="password" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-neutral-500 mb-2">Confirmer le mot de passe</label>
+                    <input type="password" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-neutral-500 mb-2">Nom / Pseudo</label>
+                    <input type="text" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-6">
+                    <button type="submit"
+                        class="w-full py-3 bg-primary text-white rounded-md hover:bg-primary-hover transition-colors">
+                        Créer mon compte
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('id');
+
+            if (!userId) {
+                document.body.innerHTML = "<div class='text-center py-20'>Utilisateur non spécifié.</div>";
+                return;
+            }
+
+            // Simulate Fetching Public Profile
+            // In a real scenario, GET /api/users/:id would return sanitized data
+            // Here we might mock it or try to find in dummy data
+            let user = null;
+
+            // Try fetch if API available or mock
+            // For demo, we might need a specific getPublicProfile method in data.js or just use existing mock capabilities
+            // mocking user for display since current JibliData might not have 'getAllUsers' accessible
+
+            user = {
+                id: userId,
+                name: "Utilisateur " + userId.substring(0, 4),
+                createdAt: new Date(),
+                avatar: `https://ui-avatars.com/api/?name=User+${userId}&background=0D9488&color=fff`,
+                isEmailVerified: true,
+                isPhoneVerified: false,
+                isIdentityVerified: true,
+                bio: "Voyageur fréquent entre Paris et Tunis. J'aime rendre service !",
+                languages: ["Français", "Arabe"],
+                location: "Paris, France",
+                rating: 4.8,
+                reviewCount: 12,
+                tripsCount: 5
+            };
+
+            // Checking if we can get real data from `data.js` via some fetch?
+            // Assuming `JibliData.fetchData` populates trips/requests, we can find user in them?
+            // Ideally we need an endpoint.
+
+            renderPublicProfile(user);
+        });
+
+        function renderPublicProfile(user) {
+            document.title = `Profil de ${user.name} - Jibli.tn`;
+            document.getElementById('publicName').textContent = user.name;
+            document.getElementById('publicJoinDate').textContent = `Membre depuis ${user.createdAt.getFullYear()}`;
+            document.getElementById('publicAvatar').src = user.avatar;
+            document.getElementById('publicBio').textContent = user.bio || "Aucune bio.";
+            document.getElementById('publicLocation').textContent = user.location || "Non spécifié";
+
+            // Stats
+            document.getElementById('statRating').textContent = user.rating;
+            document.getElementById('statReviews').textContent = user.reviewCount;
+            document.getElementById('statTrips').textContent = user.tripsCount;
+
+            // Badges
+            if (user.isEmailVerified) document.getElementById('badgeEmail').classList.remove('hidden');
+            if (user.isPhoneVerified) document.getElementById('badgePhone').classList.remove('hidden');
+            if (user.isIdentityVerified) document.getElementById('badgeIdentity').classList.remove('hidden');
+
+            // Languages
+            if (user.languages && user.languages.length > 0) {
+                const langContainer = document.getElementById('publicLanguages');
+                langContainer.innerHTML = user.languages.map(l => `<span class="bg-neutral-100 px-2 py-1 rounded text-xs text-neutral-600">${l}</span>`).join('');
+            }
+        }
+    </script>
+</body>
+
+</html>

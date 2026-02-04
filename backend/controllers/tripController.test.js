@@ -1,7 +1,7 @@
+const Trip = require('../models/Trip');
 const tripController = require('./tripController');
-const db = require('../db');
 
-jest.mock('../db');
+jest.mock('../models/Trip');
 
 describe('TripController', () => {
     let req, res;
@@ -16,39 +16,45 @@ describe('TripController', () => {
     });
 
     describe('getAllTrips', () => {
-        test('should return all trips', () => {
+        test('should return all trips', async () => {
             const mockTrips = [
                 { id: 1, from: 'Paris', to: 'Tunis' },
                 { id: 2, from: 'Lyon', to: 'Tunis' }
             ];
 
-            db.getAll.mockReturnValue(mockTrips);
+            Trip.find.mockResolvedValue(mockTrips);
 
-            tripController.getAllTrips(req, res);
+            await tripController.getAllTrips(req, res);
 
-            expect(db.getAll).toHaveBeenCalledWith('trips');
+            expect(Trip.find).toHaveBeenCalled();
             expect(res.json).toHaveBeenCalledWith(mockTrips);
+        });
+
+        test('should return 500 on server error', async () => {
+            Trip.find.mockRejectedValue(new Error('DB Error'));
+            await tripController.getAllTrips(req, res);
+            expect(res.status).toHaveBeenCalledWith(500);
         });
     });
 
     describe('getTripById', () => {
-        test('should return trip by id', () => {
+        test('should return trip by id', async () => {
             const mockTrip = { id: 1, from: 'Paris', to: 'Tunis' };
             req.params.id = '1';
 
-            db.getAll.mockReturnValue([mockTrip]);
+            Trip.findById.mockResolvedValue(mockTrip);
 
-            tripController.getTripById(req, res);
+            await tripController.getTripById(req, res);
 
-            expect(db.getAll).toHaveBeenCalledWith('trips');
+            expect(Trip.findById).toHaveBeenCalledWith('1');
             expect(res.json).toHaveBeenCalledWith(mockTrip);
         });
 
-        test('should return 404 if trip not found', () => {
+        test('should return 404 if trip not found', async () => {
             req.params.id = '999';
-            db.getAll.mockReturnValue([]);
+            Trip.findById.mockResolvedValue(null);
 
-            tripController.getTripById(req, res);
+            await tripController.getTripById(req, res);
 
             expect(res.status).toHaveBeenCalledWith(404);
             expect(res.json).toHaveBeenCalledWith({ error: 'Trip not found' });
@@ -56,7 +62,7 @@ describe('TripController', () => {
     });
 
     describe('createTrip', () => {
-        test('should create trip with valid data', () => {
+        test('should create trip with valid data', async () => {
             const tripData = {
                 from: 'Paris',
                 to: 'Tunis',
@@ -67,29 +73,31 @@ describe('TripController', () => {
             req.body = tripData;
 
             const createdTrip = { id: 1, ...tripData };
-            db.add.mockReturnValue(createdTrip);
+            // Mock Mongoose save (instance method)
+            const mockSave = jest.fn().mockResolvedValue(createdTrip);
+            Trip.mockImplementation(() => ({ save: mockSave }));
 
-            tripController.createTrip(req, res);
+            await tripController.createTrip(req, res);
 
-            expect(db.add).toHaveBeenCalledWith('trips', tripData);
+            expect(Trip).toHaveBeenCalledWith(tripData);
+            expect(mockSave).toHaveBeenCalled();
             expect(res.status).toHaveBeenCalledWith(201);
             expect(res.json).toHaveBeenCalledWith(createdTrip);
         });
 
-        test('should return 400 if from is missing', () => {
+        test('should return 400 if from is missing', async () => {
             req.body = { to: 'Tunis', departureDate: '2024-06-01' };
 
-            tripController.createTrip(req, res);
+            await tripController.createTrip(req, res);
 
             expect(res.status).toHaveBeenCalledWith(400);
             expect(res.json).toHaveBeenCalledWith({ error: 'Missing required fields' });
-            expect(db.add).not.toHaveBeenCalled();
         });
 
-        test('should return 400 if to is missing', () => {
+        test('should return 400 if to is missing', async () => {
             req.body = { from: 'Paris', departureDate: '2024-06-01' };
 
-            tripController.createTrip(req, res);
+            await tripController.createTrip(req, res);
 
             expect(res.status).toHaveBeenCalledWith(400);
             expect(res.json).toHaveBeenCalledWith({ error: 'Missing required fields' });
@@ -97,26 +105,26 @@ describe('TripController', () => {
     });
 
     describe('updateTrip', () => {
-        test('should update trip successfully', () => {
+        test('should update trip successfully', async () => {
             req.params.id = '1';
             req.body = { from: 'Updated Paris' };
 
             const updatedTrip = { id: 1, from: 'Updated Paris', to: 'Tunis' };
-            db.update.mockReturnValue(updatedTrip);
+            Trip.findByIdAndUpdate.mockResolvedValue(updatedTrip);
 
-            tripController.updateTrip(req, res);
+            await tripController.updateTrip(req, res);
 
-            expect(db.update).toHaveBeenCalledWith('trips', '1', req.body);
+            expect(Trip.findByIdAndUpdate).toHaveBeenCalledWith('1', req.body, { new: true });
             expect(res.json).toHaveBeenCalledWith(updatedTrip);
         });
 
-        test('should return 404 if trip not found', () => {
+        test('should return 404 if trip not found', async () => {
             req.params.id = '999';
             req.body = { from: 'Updated Paris' };
 
-            db.update.mockReturnValue(null);
+            Trip.findByIdAndUpdate.mockResolvedValue(null);
 
-            tripController.updateTrip(req, res);
+            await tripController.updateTrip(req, res);
 
             expect(res.status).toHaveBeenCalledWith(404);
             expect(res.json).toHaveBeenCalledWith({ error: 'Trip not found' });
@@ -124,21 +132,21 @@ describe('TripController', () => {
     });
 
     describe('deleteTrip', () => {
-        test('should delete trip successfully', () => {
+        test('should delete trip successfully', async () => {
             req.params.id = '1';
-            db.remove.mockReturnValue(true);
+            Trip.findByIdAndDelete.mockResolvedValue({ id: 1 });
 
-            tripController.deleteTrip(req, res);
+            await tripController.deleteTrip(req, res);
 
-            expect(db.remove).toHaveBeenCalledWith('trips', '1');
+            expect(Trip.findByIdAndDelete).toHaveBeenCalledWith('1');
             expect(res.json).toHaveBeenCalledWith({ message: 'Trip deleted' });
         });
 
-        test('should return 404 if trip not found', () => {
+        test('should return 404 if trip not found', async () => {
             req.params.id = '999';
-            db.remove.mockReturnValue(false);
+            Trip.findByIdAndDelete.mockResolvedValue(null);
 
-            tripController.deleteTrip(req, res);
+            await tripController.deleteTrip(req, res);
 
             expect(res.status).toHaveBeenCalledWith(404);
             expect(res.json).toHaveBeenCalledWith({ error: 'Trip not found' });

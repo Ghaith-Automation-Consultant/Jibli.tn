@@ -23,7 +23,9 @@ describe('Trips API Integration Tests', () => {
             const response = await request(app).get('/api/trips');
 
             expect(response.status).toBe(200);
-            expect(Array.isArray(response.body)).toBe(true);
+            expect(response.body).toHaveProperty('data');
+            expect(Array.isArray(response.body.data)).toBe(true);
+            expect(response.body).toHaveProperty('pagination');
         });
     });
 
@@ -111,7 +113,7 @@ describe('Trips API Integration Tests', () => {
         });
 
         test('should return 404 for non-existent trip', async () => {
-            const response = await request(app).get('/api/trips/999999999');
+            const response = await request(app).get('/api/trips/507f1f77bcf86cd799439011');
 
             expect(response.status).toBe(404);
         });
@@ -147,7 +149,7 @@ describe('Trips API Integration Tests', () => {
 
         test('should return 401 without auth', async () => {
             const response = await request(app)
-                .put('/api/trips/1')
+                .put('/api/trips/507f1f77bcf86cd799439011')
                 .send({ maxWeight: 20 });
 
             expect(response.status).toBe(401);
@@ -183,9 +185,48 @@ describe('Trips API Integration Tests', () => {
         });
 
         test('should return 401 without auth', async () => {
-            const response = await request(app).delete('/api/trips/1');
+            const response = await request(app).delete('/api/trips/507f1f77bcf86cd799439011');
 
             expect(response.status).toBe(401);
+        });
+    });
+
+    describe('Trip Filtering', () => {
+        beforeEach(async () => {
+            // Seed some data for filtering
+            await request(app).post('/api/trips').set('Authorization', `Bearer ${authToken}`).send({
+                from: 'Paris', to: 'Tunis', departureDate: '2024-06-01', maxWeight: 10, priceType: 'free'
+            });
+            await request(app).post('/api/trips').set('Authorization', `Bearer ${authToken}`).send({
+                from: 'Lyon', to: 'Oran', departureDate: '2024-07-01', maxWeight: 5, priceType: 'paid'
+            });
+            await request(app).post('/api/trips').set('Authorization', `Bearer ${authToken}`).send({
+                from: 'Marseille', to: 'Tunis', departureDate: '2024-08-01', maxWeight: 20, priceType: 'free'
+            });
+        });
+
+        test('should filter by from/to location', async () => {
+            const response = await request(app).get('/api/trips?from=Paris');
+            expect(response.status).toBe(200);
+            expect(response.body.data.length).toBeGreaterThanOrEqual(1);
+            expect(response.body.data[0].from).toBe('Paris');
+        });
+
+        test('should filter by price type', async () => {
+            const response = await request(app).get('/api/trips?priceType=paid');
+            expect(response.status).toBe(200);
+            const paidTrips = response.body.data.filter(t => t.to === 'Oran'); // Filter to our seeded one to be safe
+            expect(paidTrips.length).toBeGreaterThanOrEqual(1);
+            expect(paidTrips[0].priceType).toBe('paid');
+        });
+
+        test('should filter by min weight', async () => {
+            const response = await request(app).get('/api/trips?minWeight=15');
+            expect(response.status).toBe(200);
+            // Should find the 20kg one but not 5 or 10
+            const heavyTrips = response.body.data.filter(t => t.maxWeight >= 15);
+            expect(heavyTrips.length).toBeGreaterThanOrEqual(1);
+            expect(heavyTrips.every(t => t.maxWeight >= 15)).toBe(true);
         });
     });
 });

@@ -7,10 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Jibli.tn</title>
     <meta name="description" content="Gérez vos voyages et vos demandes sur Jibli.tn">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="../js/tailwind.config.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/output.css">
     <link
         href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet">
@@ -23,20 +21,22 @@
             <div class="flex justify-between items-center">
                 <!-- Logo -->
                 <div class="flex items-center space-x-2">
-                    <a href="template.html" class="flex items-center" onclick="navigateTo('home')">
+                    <a href="index.html" class="flex items-center" onclick="navigateTo('home')">
                         <img src="../assets/logos/Jibli.tn.png" alt="Jibli.tn" class="h-12 w-auto object-contain">
                     </a>
                 </div>
 
                 <!-- Navigation principale -->
                 <div class="hidden md:flex space-x-8">
-                    <a href="template.html" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                    <a href="index.html" class="text-neutral-500 hover:text-primary font-medium transition-colors"
                         onclick="navigateTo('home')">Accueil</a>
-                    <a href="#" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                    <a href="recherche.html?type=trips"
+                        class="text-neutral-500 hover:text-primary font-medium transition-colors"
                         onclick="navigateTo('voyages')">Voyages</a>
-                    <a href="#" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                    <a href="recherche.html?type=requests"
+                        class="text-neutral-500 hover:text-primary font-medium transition-colors"
                         onclick="navigateTo('demandes')">Demandes</a>
-                    <a href="#" class="text-primary font-bold transition-colors"
+                    <a href="dashboard.html" id="navDashboard" class="hidden text-primary font-bold transition-colors"
                         onclick="navigateTo('dashboard')">Dashboard</a>
                 </div>
 
@@ -63,7 +63,11 @@
             <h1 class="text-3xl font-bold text-neutral-900 mb-8">Mon Tableau de Bord</h1>
 
             <!-- Tabs -->
-            <div class="flex border-b border-neutral-200 mb-8">
+            <div class="flex border-b border-neutral-200 mb-8 overflow-x-auto">
+                <button id="tabOverview" onclick="switchDashboardTab('overview')"
+                    class="px-6 py-3 font-bold text-primary border-b-2 border-primary hover:bg-neutral-50 transition-colors whitespace-nowrap">
+                    <i class="fas fa-home mr-2"></i> Vue d'ensemble
+                </button>
                 <button id="tabMyTrips" onclick="switchDashboardTab('trips')"
                     class="px-6 py-3 font-bold text-primary border-b-2 border-primary hover:bg-neutral-50 transition-colors">
                     <i class="fas fa-plane-departure mr-2"></i> Mes Voyages
@@ -72,10 +76,87 @@
                     class="px-6 py-3 font-medium text-neutral-500 hover:text-primary hover:bg-neutral-50 transition-colors">
                     <i class="fas fa-box mr-2"></i> Mes Demandes
                 </button>
+                <button id="tabMessages" onclick="switchDashboardTab('messages')"
+                    class="px-6 py-3 font-medium text-neutral-500 hover:text-primary hover:bg-neutral-50 transition-colors whitespace-nowrap">
+                    <i class="fas fa-envelope mr-2"></i> Messagerie
+                </button>
+                <button id="tabProfile" onclick="switchDashboardTab('profile')"
+                    class="px-6 py-3 font-medium text-neutral-500 hover:text-primary hover:bg-neutral-50 transition-colors whitespace-nowrap">
+                    <i class="fas fa-user-cog mr-2"></i> Mon Profil
+                </button>
             </div>
 
             <!-- Content -->
-            <div id="myTripsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div id="overviewContainer" class="space-y-8">
+                <!-- Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-gray-500 font-medium">Voyages Actifs</h3>
+                            <div
+                                class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-plane"></i>
+                            </div>
+                        </div>
+                        <p class="text-3xl font-bold text-gray-900" id="statActiveTrips">0</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-gray-500 font-medium">Demandes en cours</h3>
+                            <div
+                                class="w-10 h-10 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-box"></i>
+                            </div>
+                        </div>
+                        <p class="text-3xl font-bold text-gray-900" id="statActiveRequests">0</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-neutral-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-gray-500 font-medium">Messages non lus</h3>
+                            <div
+                                class="w-10 h-10 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center">
+                                <i class="fas fa-comment-dots"></i>
+                            </div>
+                        </div>
+                        <p class="text-3xl font-bold text-gray-900" id="statUnreadMessages">0</p>
+                    </div>
+                </div>
+
+                <!-- Actions Rapides -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-gradient-to-r from-primary to-teal-600 rounded-lg shadow-md p-6 text-white flex items-center justify-between cursor-pointer hover:shadow-lg transition-shadow"
+                        onclick="openCreateTripModal()">
+                        <div>
+                            <h3 class="font-bold text-xl mb-1">Publier un voyage</h3>
+                            <p class="text-teal-100 text-sm">Vous voyagez bientôt ? Rentabilisez votre trajet.</p>
+                        </div>
+                        <i class="fas fa-plane-departure text-3xl opacity-80"></i>
+                    </div>
+                    <div class="bg-white border border-neutral-200 rounded-lg shadow-sm p-6 flex items-center justify-between cursor-pointer hover:border-primary transition-colors group"
+                        onclick="openCreateRequestModal()">
+                        <div>
+                            <h3 class="font-bold text-xl mb-1 text-gray-900 group-hover:text-primary transition-colors">
+                                Faire une demande</h3>
+                            <p class="text-gray-500 text-sm">Besoin de recevoir quelque chose ?</p>
+                        </div>
+                        <i
+                            class="fas fa-box-open text-3xl text-gray-300 group-hover:text-primary transition-colors"></i>
+                    </div>
+                </div>
+
+                <!-- Activité Récente (Placeholder) -->
+                <div class="bg-white rounded-lg shadow-sm border border-neutral-200 p-6">
+                    <h3 class="font-bold text-lg mb-4 text-gray-900">Activité Récente</h3>
+                    <ul class="space-y-4" id="recentActivityList">
+                        <li class="flex items-start text-sm text-gray-600">
+                            <div class="w-2 h-2 bg-gray-300 rounded-full mt-1.5 mr-3"></div>
+                            <p>Bienvenue sur votre nouveau tableau de bord ! Commencez par compléter votre profil.</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="myTripsContainer" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Trip Cards will be injected here -->
                 <p class="col-span-full text-center text-neutral-500 py-12">Chargement de vos voyages...</p>
             </div>
@@ -83,6 +164,83 @@
             <div id="myRequestsContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Request Cards will be injected here -->
                 <p class="col-span-full text-center text-neutral-500 py-12">Chargement de vos demandes...</p>
+            </div>
+
+            <div id="profileContainer"
+                class="hidden bg-white rounded-lg shadow-sm border border-neutral-200 p-8 max-w-2xl mx-auto">
+                <div class="flex items-center space-x-6 mb-8">
+                    <div class="w-24 h-24 bg-neutral-200 rounded-full overflow-hidden">
+                        <img src="https://ui-avatars.com/api/?name=User&background=random" id="profilePageAvatar"
+                            class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900" id="profilePageName">Chargement...</h2>
+                        <p class="text-gray-500" id="profilePageEmail">...</p>
+                        <div
+                            class="mt-2 text-sm text-green-600 bg-green-50 px-2 py-1 rounded inline-block border border-green-100">
+                            <i class="fas fa-shield-alt mr-1"></i> Compte Actif
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <button onclick="window.location.href='profile.html'"
+                        class="w-full flex items-center justify-between p-4 border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors">
+                        <span class="font-medium text-gray-700"><i class="fas fa-edit mr-3 text-gray-400"></i> Modifier
+                            mes informations</span>
+                        <i class="fas fa-chevron-right text-gray-400"></i>
+                    </button>
+                    <button
+                        class="w-full flex items-center justify-between p-4 border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors">
+                        <span class="font-medium text-gray-700"><i class="fas fa-lock mr-3 text-gray-400"></i> Changer
+                            mon mot de passe</span>
+                        <i class="fas fa-chevron-right text-gray-400"></i>
+                    </button>
+                    <button
+                        class="w-full flex items-center justify-between p-4 border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors">
+                        <span class="font-medium text-gray-700"><i class="fas fa-bell mr-3 text-gray-400"></i>
+                            Préférences de notification</span>
+                        <i class="fas fa-chevron-right text-gray-400"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="messagesContainer"
+                class="hidden bg-white rounded-lg shadow-sm border border-neutral-200 min-h-[500px] flex">
+                <!-- Sidebar -->
+                <div class="w-1/3 border-r border-neutral-200">
+                    <div class="p-4 border-b border-neutral-200">
+                        <h3 class="font-bold text-lg">Conversations</h3>
+                    </div>
+                    <div id="conversationsList" class="overflow-y-auto h-[450px]">
+                        <!-- Conversations items -->
+                        <p class="text-center text-neutral-500 py-4">Chargement...</p>
+                    </div>
+                </div>
+                <!-- Chat Area -->
+                <div class="w-2/3 flex flex-col">
+                    <div id="chatHeader"
+                        class="p-4 border-b border-neutral-200 flex justify-between items-center hidden">
+                        <h3 class="font-bold text-lg" id="chatUserName">Nom Utilisateur</h3>
+                    </div>
+                    <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-neutral-50 hidden">
+                        <!-- Messages -->
+                    </div>
+                    <div id="chatEmptyState" class="flex-1 flex items-center justify-center flex-col text-neutral-500">
+                        <i class="fas fa-comments text-4xl mb-4"></i>
+                        <p>Sélectionnez une conversation pour commencer</p>
+                    </div>
+                    <div id="chatInputArea" class="p-4 border-t border-neutral-200 hidden">
+                        <form onsubmit="handleSendMessage(event)" class="flex space-x-2">
+                            <input type="text" id="messageInput" required placeholder="Votre message..."
+                                class="flex-1 px-4 py-2 border border-neutral-200 rounded-lg focus:outline-none focus:border-primary">
+                            <button type="submit"
+                                class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -260,7 +418,93 @@
     </div>
 
     <!-- Scripts -->
+    <!-- Modal Connexion -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-neutral-900">Connexion</h3>
+                <button onclick="closeLoginModal()" class="text-neutral-500 hover:text-neutral-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="mb-4">
+                    <label class="block text-neutral-500 mb-2">Email</label>
+                    <input type="email" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-neutral-500 mb-2">Mot de passe</label>
+                    <input type="password" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-6">
+                    <button type="submit"
+                        class="w-full py-3 bg-primary text-white rounded-md hover:bg-primary-hover transition-colors">
+                        Se connecter
+                    </button>
+                </div>
+
+                <div class="text-center text-neutral-500">
+                    Pas encore de compte ?
+                    <button type="button" onclick="switchToRegister()"
+                        class="text-primary hover:underline font-medium">S'inscrire</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Inscription -->
+    <div id="registerModal"
+        class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-neutral-900">Inscription</h3>
+                <button onclick="closeRegisterModal()" class="text-neutral-500 hover:text-neutral-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="mb-4">
+                    <label class="block text-neutral-500 mb-2">Email</label>
+                    <input type="email" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-neutral-500 mb-2">Mot de passe</label>
+                    <input type="password" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-neutral-500 mb-2">Confirmer le mot de passe</label>
+                    <input type="password" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-neutral-500 mb-2">Nom / Pseudo</label>
+                    <input type="text" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-6">
+                    <button type="submit"
+                        class="w-full py-3 bg-primary text-white rounded-md hover:bg-primary-hover transition-colors">
+                        Créer mon compte
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="../js/data.js"></script>
+    <script src="../js/utils.js"></script>
     <script src="../js/render.js"></script>
     <script src="../js/main.js"></script>
     <script src="../js/dashboard.js"></script>

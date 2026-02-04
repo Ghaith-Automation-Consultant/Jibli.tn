@@ -9,12 +9,12 @@
 ### Infrastructure de Base
 - [x] Architecture modulaire Backend (Routes/Controllers)
 - [x] Serveur Node.js/Express avec API RESTful
-- [x] JSON File Store pour prototypage rapide
+- [x] **MongoDB Database** (Mongoose) - *Migrated from JSON*
 - [x] Frontend responsive avec Tailwind CSS
 
 ### Sécurité & Authentification
-- [x] JWT authentication avec tokens 7 jours
-- [x] Bcrypt password hashing (10 salt rounds)
+- [x] ✅ JWT authentication avec tokens 7 jours
+- [x] ✅ Bcrypt password hashing (10 salt rounds)
 - [x] Auth middleware protégeant les routes sensibles
 - [x] Validation middleware sur tous les endpoints
 
@@ -36,8 +36,8 @@
 - [ ] Statistiques personnelles (voyages complétés, avis reçus)
 
 ### Performance & Scalabilité
-- [ ] Filtrage et recherche côté serveur
-- [ ] Pagination des résultats (20 items/page)
+- [x] Filtrage et recherche côté serveur (Backend)
+- [x] Pagination des résultats (20 items/page) (Backend)
 - [ ] Indexation pour recherche rapide
 - [ ] Cache Redis pour requêtes fréquentes
 

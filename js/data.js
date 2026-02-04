@@ -78,15 +78,25 @@ const JibliData = {
     },
 
     // API Methods
-    async fetchData() {
+    async fetchData(tripParams = {}, requestParams = {}) {
         try {
+            // Convert params objects to query strings
+            const tripsQuery = new URLSearchParams(tripParams).toString();
+            const requestsQuery = new URLSearchParams(requestParams).toString();
+
             const [tripsRes, requestsRes] = await Promise.all([
-                fetch('/api/trips'),
-                fetch('/api/requests')
+                fetch(`/api/trips?${tripsQuery}`),
+                fetch(`/api/requests?${requestsQuery}`)
             ]);
 
-            if (tripsRes.ok) this.trips = await tripsRes.json();
-            if (requestsRes.ok) this.requests = await requestsRes.json();
+            if (tripsRes.ok) {
+                const data = await tripsRes.json();
+                this.trips = data.data || data; // Fallback for backward compatibility if needed
+            }
+            if (requestsRes.ok) {
+                const data = await requestsRes.json();
+                this.requests = data.data || data;
+            }
 
             console.log('Data fetched:', this.trips.length, 'trips,', this.requests.length, 'requests');
             return true;
@@ -218,5 +228,61 @@ const JibliData = {
         });
         if (!res.ok) throw new Error('Failed to update user');
         return await res.json();
+    },
+
+    async getUser(id) {
+        const res = await fetch(`/api/users/${id}`, {
+            headers: this.getAuthHeaders()
+        });
+        if (!res.ok) throw new Error('Failed to fetch user');
+        return await res.json();
+    },
+
+    async getMe() {
+        return this.getUser('me');
+    },
+
+    async updateMe(updates) {
+        return this.updateUser('me', updates);
+    },
+
+    // Messaging Methods
+    async getConversations() {
+        const res = await fetch('/api/messages/conversations', {
+            headers: this.getAuthHeaders()
+        });
+        if (!res.ok) throw new Error('Failed to fetch conversations');
+        return await res.json();
+    },
+
+    async getMessages(userId) {
+        const res = await fetch(`/api/messages/${userId}`, {
+            headers: this.getAuthHeaders()
+        });
+        if (!res.ok) throw new Error('Failed to fetch messages');
+        return await res.json();
+    },
+
+    async sendMessage(receiverId, content) {
+        const res = await fetch('/api/messages', {
+            method: 'POST',
+            headers: this.getAuthHeaders(),
+            body: JSON.stringify({ receiverId, content })
+        });
+        if (!res.ok) throw new Error('Failed to send message');
+        return await res.json();
+    },
+
+    async markAsRead(userId) {
+        const res = await fetch(`/api/messages/${userId}/read`, {
+            method: 'PUT',
+            headers: this.getAuthHeaders()
+        });
+        if (!res.ok) throw new Error('Failed to mark messages as read');
+        return await res.json();
     }
 };
+
+if (typeof module !== 'undefined') {
+    module.exports = JibliData;
+}

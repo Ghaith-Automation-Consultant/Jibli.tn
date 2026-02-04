@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 
 test.describe('Search and Browse Flow', () => {
     test('should navigate to search page', async ({ page }) => {
-        await page.goto('/template.html');
+        await page.goto('/index.html');
 
         // Click on "Voyages" in navigation
         await page.click('text=Voyages');
@@ -15,7 +15,7 @@ test.describe('Search and Browse Flow', () => {
     });
 
     test('should display trip listings', async ({ page }) => {
-        await page.goto('/template.html');
+        await page.goto('/index.html');
 
         // Navigate to trips page
         await page.click('text=Voyages');
@@ -30,7 +30,7 @@ test.describe('Search and Browse Flow', () => {
     });
 
     test('should filter trips by location', async ({ page }) => {
-        await page.goto('/template.html');
+        await page.goto('/index.html');
         await page.click('text=Voyages');
         await page.waitForTimeout(1000);
 
@@ -47,7 +47,7 @@ test.describe('Search and Browse Flow', () => {
     });
 
     test('should display request listings', async ({ page }) => {
-        await page.goto('/template.html');
+        await page.goto('/index.html');
 
         // Navigate to requests page
         await page.click('text=Demandes');
@@ -61,7 +61,7 @@ test.describe('Search and Browse Flow', () => {
     });
 
     test('should navigate between tabs on search page', async ({ page }) => {
-        await page.goto('/template.html');
+        await page.goto('/index.html');
         await page.click('text=Voyages');
         await page.waitForTimeout(500);
 
@@ -83,7 +83,7 @@ test.describe('Search and Browse Flow', () => {
     });
 
     test('should show empty state when no results', async ({ page }) => {
-        await page.goto('/template.html');
+        await page.goto('/index.html');
         await page.click('text=Voyages');
         await page.waitForTimeout(1000);
 

@@ -8,10 +8,8 @@
     <title>Jibli.tn - Transport d'objets entre Tunisiens</title>
     <meta name="description"
         content="Plateforme peer-to-peer de mise en relation pour le transport d'objets entre Tunisiens (diaspora ↔ Tunisie)">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="../js/tailwind.config.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/output.css">
     <link
         href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet">
@@ -33,15 +31,19 @@
 
                 <!-- Navigation principale -->
                 <div class="hidden md:flex space-x-8">
-                    <a href="#" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                    <a href="index.html" class="text-neutral-500 hover:text-primary font-medium transition-colors"
                         onclick="navigateTo('home')">Accueil</a>
-                    <a href="#" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                    <a href="recherche.html?type=trips"
+                        class="text-neutral-500 hover:text-primary font-medium transition-colors"
                         onclick="navigateTo('voyages')">Voyages</a>
-                    <a href="#" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                    <a href="recherche.html?type=requests"
+                        class="text-neutral-500 hover:text-primary font-medium transition-colors"
                         onclick="navigateTo('demandes')">Demandes</a>
-                    <a href="#" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                    <a href="dashboard.html" id="navDashboard"
+                        class="hidden text-neutral-500 hover:text-primary font-medium transition-colors"
                         onclick="navigateTo('dashboard')">Dashboard</a>
-                    <a href="#" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                    <a href="index.html#comment-ca-marche"
+                        class="text-neutral-500 hover:text-primary font-medium transition-colors"
                         onclick="navigateTo('comment-ca-marche')">Comment ça marche</a>
                 </div>
 
@@ -269,13 +271,15 @@
                 <div>
                     <h3 class="text-lg font-bold mb-4">Navigation</h3>
                     <ul class="space-y-2">
-                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors"
+                        <li><a href="index.html" class="text-neutral-400 hover:text-white transition-colors"
                                 onclick="navigateTo('home')">Accueil</a></li>
-                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors"
+                        <li><a href="recherche.html?type=trips"
+                                class="text-neutral-400 hover:text-white transition-colors"
                                 onclick="navigateTo('voyages')">Voyages</a></li>
-                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors"
+                        <li><a href="recherche.html?type=requests"
+                                class="text-neutral-400 hover:text-white transition-colors"
                                 onclick="navigateTo('demandes')">Demandes</a></li>
-                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors"
+                        <li><a href="dashboard.html" class="text-neutral-400 hover:text-white transition-colors"
                                 onclick="navigateTo('dashboard')">Dashboard</a></li>
                     </ul>
                 </div>
@@ -283,11 +287,11 @@
                 <div>
                     <h3 class="text-lg font-bold mb-4">Légal</h3>
                     <ul class="space-y-2">
-                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors"
+                        <li><a href="conditions.html" class="text-neutral-400 hover:text-white transition-colors"
                                 onclick="navigateTo('conditions')">Conditions d'utilisation</a></li>
-                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors"
+                        <li><a href="confidentialite.html" class="text-neutral-400 hover:text-white transition-colors"
                                 onclick="navigateTo('confidentialite')">Politique de confidentialité</a></li>
-                        <li><a href="#" class="text-neutral-400 hover:text-white transition-colors"
+                        <li><a href="securite.html" class="text-neutral-400 hover:text-white transition-colors"
                                 onclick="navigateTo('securite')">Sécurité</a></li>
                     </ul>
                 </div>
@@ -580,6 +584,7 @@
     </div>
 
     <script src="../js/data.js"></script>
+    <script src="../js/utils.js"></script>
     <script src="../js/render.js"></script>
     <script src="../js/main.js"></script>
 </body>

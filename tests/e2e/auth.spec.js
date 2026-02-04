@@ -6,7 +6,7 @@ test.describe('Authentication Flow', () => {
     const userName = 'E2E Test User';
 
     test('should complete registration flow', async ({ page }) => {
-        await page.goto('/template.html');
+        await page.goto('/index.html');
 
         // Click register button
         await page.click('text=Inscription');
@@ -32,7 +32,7 @@ test.describe('Authentication Flow', () => {
 
     test('should complete login flow', async ({ page }) => {
         // First register a user
-        await page.goto('/template.html');
+        await page.goto('/index.html');
         await page.click('text=Inscription');
         await page.waitForSelector('#registerModal', { state: 'visible' });
 
@@ -62,7 +62,7 @@ test.describe('Authentication Flow', () => {
     });
 
     test('should show error with invalid credentials', async ({ page }) => {
-        await page.goto('/template.html');
+        await page.goto('/index.html');
         await page.click('text=Connexion');
         await page.waitForSelector('#loginModal', { state: 'visible' });
 
@@ -79,7 +79,7 @@ test.describe('Authentication Flow', () => {
 
     test('should logout successfully', async ({ page }) => {
         // First login
-        await page.goto('/template.html');
+        await page.goto('/index.html');
         await page.click('text=Inscription');
         await page.waitForSelector('#registerModal', { state: 'visible' });
 

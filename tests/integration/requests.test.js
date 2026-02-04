@@ -23,7 +23,9 @@ describe('Requests API Integration Tests', () => {
             const response = await request(app).get('/api/requests');
 
             expect(response.status).toBe(200);
-            expect(Array.isArray(response.body)).toBe(true);
+            expect(response.body).toHaveProperty('data');
+            expect(Array.isArray(response.body.data)).toBe(true);
+            expect(response.body).toHaveProperty('pagination');
         });
     });
 
@@ -108,7 +110,7 @@ describe('Requests API Integration Tests', () => {
         });
 
         test('should return 404 for non-existent request', async () => {
-            const response = await request(app).get('/api/requests/999999999');
+            const response = await request(app).get('/api/requests/507f1f77bcf86cd799439011');
 
             expect(response.status).toBe(404);
         });
@@ -144,7 +146,7 @@ describe('Requests API Integration Tests', () => {
 
         test('should return 401 without auth', async () => {
             const response = await request(app)
-                .put('/api/requests/1')
+                .put('/api/requests/507f1f77bcf86cd799439011')
                 .send({ budget: 30 });
 
             expect(response.status).toBe(401);
@@ -180,9 +182,43 @@ describe('Requests API Integration Tests', () => {
         });
 
         test('should return 401 without auth', async () => {
-            const response = await request(app).delete('/api/requests/1');
+            const response = await request(app).delete('/api/requests/507f1f77bcf86cd799439011');
 
             expect(response.status).toBe(401);
+        });
+    });
+
+    describe('Request Filtering', () => {
+        beforeEach(async () => {
+            // Seed some data
+            await request(app).post('/api/requests').set('Authorization', `Bearer ${authToken}`).send({
+                item: 'Laptop', location: 'Tunis', weight: 2, budget: 100
+            });
+            await request(app).post('/api/requests').set('Authorization', `Bearer ${authToken}`).send({
+                item: 'Documents', location: 'Sousse', weight: 0.1, budget: 20
+            });
+        });
+
+        test('should filter by location', async () => {
+            const response = await request(app).get('/api/requests?location=Sousse');
+            expect(response.status).toBe(200);
+            expect(response.body.data.length).toBeGreaterThanOrEqual(1);
+            expect(response.body.data[0].location).toBe('Sousse');
+        });
+
+        test('should filter by text query', async () => {
+            const response = await request(app).get('/api/requests?query=Laptop');
+            expect(response.status).toBe(200);
+            expect(response.body.data.some(r => r.item === 'Laptop')).toBe(true);
+        });
+
+        test('should filter by max budget', async () => {
+            const response = await request(app).get('/api/requests?maxBudget=50');
+            expect(response.status).toBe(200);
+            // Should find Documents (20) but not Laptop (100)
+            const cheapRequests = response.body.data.filter(r => r.budget <= 50);
+            expect(cheapRequests.length).toBeGreaterThanOrEqual(1);
+            expect(cheapRequests.every(r => r.budget <= 50)).toBe(true);
         });
     });
 });

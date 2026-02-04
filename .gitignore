@@ -32,3 +32,6 @@ yarn-error.log*
 
 # Data (Optional: ignore if you want to keep fresh for development)
 # backend/data.json
+
+# Temporary/Log files
+*.txt

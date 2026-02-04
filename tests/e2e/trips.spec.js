@@ -5,7 +5,7 @@ test.describe('Trip Management Flow', () => {
 
     test.beforeEach(async ({ page }) => {
         // Register and login before each test
-        await page.goto('/template.html');
+        await page.goto('/index.html');
         await page.click('text=Inscription');
         await page.waitForSelector('#registerModal', { state: 'visible' });
 
@@ -19,8 +19,8 @@ test.describe('Trip Management Flow', () => {
         authToken = await page.evaluate(() => localStorage.getItem('jibli_token'));
     });
 
-    test('should create a new trip', async ({ page }) => {
-        await page.goto('/template.html');
+    test('should allow creating a trip when logged in', async ({ page }) => {
+        await page.goto('/index.html');
 
         // Click "Publier un voyage" button
         await page.click('text=Publier un voyage');
@@ -53,7 +53,7 @@ test.describe('Trip Management Flow', () => {
     });
 
     test('should show validation errors for invalid trip data', async ({ page }) => {
-        await page.goto('/template.html');
+        await page.goto('/index.html');
         await page.click('text=Publier un voyage');
         await page.waitForSelector('#createTripModal', { state: 'visible' });
 
@@ -70,7 +70,7 @@ test.describe('Trip Management Flow', () => {
 
     test('should view trip details', async ({ page }) => {
         // First create a trip
-        await page.goto('/template.html');
+        await page.goto('/index.html');
         await page.click('text=Publier un voyage');
         await page.waitForSelector('#createTripModal', { state: 'visible' });
 
@@ -98,7 +98,7 @@ test.describe('Trip Management Flow', () => {
     });
 
     test('should navigate to dashboard and see my trips', async ({ page }) => {
-        await page.goto('/template.html');
+        await page.goto('/index.html');
 
         // Navigate to dashboard
         await page.click('text=Dashboard');

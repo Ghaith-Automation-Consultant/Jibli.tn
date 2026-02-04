@@ -6,17 +6,18 @@ const validateTrip = (req, res, next) => {
     const { from, to, departureDate, maxWeight } = req.body;
     const errors = [];
 
-    if (!from || from.trim() === '') {
-        errors.push('Departure location (from) is required');
+    // Required fields check only for creation (POST)
+    if (req.method === 'POST') {
+        if (!from || from.trim() === '') errors.push('Departure location (from) is required');
+        if (!to || to.trim() === '') errors.push('Arrival location (to) is required');
+        if (!departureDate) errors.push('Departure date is required');
     }
 
-    if (!to || to.trim() === '') {
-        errors.push('Arrival location (to) is required');
-    }
+    // Format validation if fields are present
+    if (from !== undefined && from.trim() === '') errors.push('Departure location (from) cannot be empty');
+    if (to !== undefined && to.trim() === '') errors.push('Arrival location (to) cannot be empty');
 
-    if (!departureDate) {
-        errors.push('Departure date is required');
-    } else {
+    if (departureDate) {
         const date = new Date(departureDate);
         if (isNaN(date.getTime())) {
             errors.push('Invalid departure date format');
@@ -41,13 +42,15 @@ const validateRequest = (req, res, next) => {
     const { item, location } = req.body;
     const errors = [];
 
-    if (!item || item.trim() === '') {
-        errors.push('Item name is required');
+    // Required fields check only for creation (POST)
+    if (req.method === 'POST') {
+        if (!item || item.trim() === '') errors.push('Item name is required');
+        if (!location || location.trim() === '') errors.push('Location is required');
     }
 
-    if (!location || location.trim() === '') {
-        errors.push('Location is required');
-    }
+    // Format validation if fields are present
+    if (item !== undefined && item.trim() === '') errors.push('Item name cannot be empty');
+    if (location !== undefined && location.trim() === '') errors.push('Location cannot be empty');
 
     if (req.body.weight !== undefined) {
         const weight = parseFloat(req.body.weight);

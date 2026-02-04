@@ -3,10 +3,17 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 
 // Route Imports
+// Route Imports
 const tripsRoutes = require('./backend/routes/trips');
 const requestsRoutes = require('./backend/routes/requests');
 const authRoutes = require('./backend/routes/auth');
 const usersRoutes = require('./backend/routes/users');
+const connectDB = require('./backend/config/db');
+
+// Connect to Database
+if (process.env.NODE_ENV !== 'test') {
+    connectDB();
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,6 +35,11 @@ app.use('/api/trips', tripsRoutes);
 app.use('/api/requests', requestsRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);
+app.use('/api/messages', require('./backend/routes/messages'));
+app.use('/api/stats', require('./backend/routes/stats'));
+
+// Error Handling Middleware
+app.use(require('./backend/middleware/error'));
 
 // Start server only if not in test mode
 if (require.main === module) {

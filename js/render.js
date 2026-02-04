@@ -49,7 +49,7 @@ function createTripCard(trip) {
                 </div>
             </div>
 
-            <button onclick="showTripDetails(${trip.id})"
+            <button onclick="showTripDetails('${trip.id}')"
                 class="w-full py-2 bg-primary text-white rounded-md hover:bg-primary-hover transition-colors">
                 Voir les détails
             </button>
@@ -96,7 +96,7 @@ function createRequestCard(request) {
             </div>
         </div>
 
-        <button onclick="showRequestDetails(${request.id})"
+        <button onclick="showRequestDetails('${request.id}')"
             class="w-full py-2 border border-primary text-primary rounded-md hover:bg-primary hover:text-white transition-colors">
             Répondre à cette demande
         </button>

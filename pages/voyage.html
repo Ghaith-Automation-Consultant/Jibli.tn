@@ -7,10 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Détails du voyage - Jibli.tn</title>
     <meta name="description" content="Détails du voyage Paris vers Tunis - Jibli.tn">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="../js/tailwind.config.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/output.css">
     <link
         href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet">
@@ -30,18 +28,51 @@
 
                 <!-- Navigation principale -->
                 <div class="hidden md:flex space-x-8">
-                    <a href="#" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                    <a href="index.html" class="text-neutral-500 hover:text-primary font-medium transition-colors"
                         onclick="navigateTo('home')">Accueil</a>
-                    <a href="#" class="text-primary font-medium border-b-2 border-primary pb-1">Voyages</a>
-                    <a href="#" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                    <a href="recherche.html?type=trips" class="text-primary font-bold border-b-2 border-primary pb-1"
+                        onclick="navigateTo('voyages')">Voyages</a>
+                    <a href="recherche.html?type=requests"
+                        class="text-neutral-500 hover:text-primary font-medium transition-colors"
                         onclick="navigateTo('demandes')">Demandes</a>
-                    <a href="#" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                    <a href="dashboard.html" id="navDashboard"
+                        class="hidden text-neutral-500 hover:text-primary font-medium transition-colors"
                         onclick="navigateTo('dashboard')">Dashboard</a>
                 </div>
 
                 <!-- Actions utilisateur -->
                 <div class="flex items-center space-x-4">
-                    <div id="userMenu" class="block">
+                    <!-- Sélecteur de langue -->
+                    <div class="language-switcher relative">
+                        <button id="languageBtn"
+                            class="flex items-center space-x-2 px-3 py-2 rounded-md border border-neutral-200 hover:border-primary transition-colors">
+                            <span class="text-neutral-500">🇫🇷 FR</span>
+                            <i class="fas fa-chevron-down text-xs text-neutral-500"></i>
+                        </button>
+                        <div id="languageDropdown"
+                            class="absolute hidden mt-2 w-32 bg-white rounded-md shadow-lg border border-neutral-200">
+                            <button class="w-full text-left px-4 py-2 hover:bg-neutral-100 transition-colors"
+                                onclick="changeLanguage('fr')">🇫🇷 Français</button>
+                            <button class="w-full text-left px-4 py-2 hover:bg-neutral-100 transition-colors rtl-text"
+                                onclick="changeLanguage('ar')">🇹🇳 العربية</button>
+                            <button class="w-full text-left px-4 py-2 hover:bg-neutral-100 transition-colors"
+                                onclick="changeLanguage('en')">🇬🇧 English</button>
+                        </div>
+                    </div>
+
+                    <!-- Boutons auth -->
+                    <div id="authButtons" class="flex space-x-3">
+                        <button onclick="showLoginModal()"
+                            class="px-4 py-2 border border-primary text-primary rounded-md hover:bg-primary hover:text-white transition-colors">
+                            Connexion
+                        </button>
+                        <button onclick="showRegisterModal()"
+                            class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-hover transition-colors">
+                            Inscription
+                        </button>
+                    </div>
+
+                    <div id="userMenu" class="block hidden">
                         <button id="userMenuBtn" class="flex items-center space-x-2">
                             <div class="w-10 h-10 bg-neutral-200 rounded-full overflow-hidden">
                                 <img src="https://picsum.photos/40?random=100" alt="Photo de profil"
@@ -50,6 +81,30 @@
                             <span class="text-neutral-500 font-medium hidden md:inline">Mohamed</span>
                             <i class="fas fa-chevron-down text-xs text-neutral-500 hidden md:inline"></i>
                         </button>
+                        <div id="userDropdown"
+                            class="absolute hidden mt-2 w-48 bg-white rounded-md shadow-lg border border-neutral-200 right-0">
+                            <a href="#" class="block px-4 py-3 hover:bg-neutral-100 transition-colors"
+                                onclick="navigateTo('dashboard')">
+                                <i class="fas fa-tachometer-alt mr-2 text-neutral-500"></i>
+                                Dashboard
+                            </a>
+                            <a href="#" class="block px-4 py-3 hover:bg-neutral-100 transition-colors"
+                                onclick="navigateTo('profile')">
+                                <i class="fas fa-user mr-2 text-neutral-500"></i>
+                                Mon profil
+                            </a>
+                            <a href="#" class="block px-4 py-3 hover:bg-neutral-100 transition-colors"
+                                onclick="navigateTo('messages')">
+                                <i class="fas fa-envelope mr-2 text-neutral-500"></i>
+                                Messages
+                            </a>
+                            <hr class="border-neutral-200">
+                            <button onclick="logout()"
+                                class="w-full text-left px-4 py-3 text-error hover:bg-neutral-100 transition-colors">
+                                <i class="fas fa-sign-out-alt mr-2"></i>
+                                Déconnexion
+                            </button>
+                        </div>
                     </div>
                     <!-- Menu mobile -->
                     <button id="mobileMenuBtn" class="md:hidden text-neutral-500">
@@ -92,22 +147,25 @@
                         <div class="p-6 border-b border-neutral-200 bg-gradient-to-r from-neutral-50 to-white">
                             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
                                 <div class="flex items-center space-x-3 mb-2 md:mb-0">
-                                    <h1 class="text-2xl md:text-3xl font-bold text-neutral-900">Paris</h1>
+                                    <h1 id="tripOrigin" class="text-2xl md:text-3xl font-bold text-neutral-900">Origine
+                                    </h1>
                                     <i class="fas fa-arrow-right text-gray-400"></i>
-                                    <h1 class="text-2xl md:text-3xl font-bold text-neutral-900">Tunis</h1>
+                                    <h1 id="tripDestination" class="text-2xl md:text-3xl font-bold text-neutral-900">
+                                        Destination</h1>
                                 </div>
-                                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                                <span id="tripBadge"
+                                    class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
                                     Voyage vérifié
                                 </span>
                             </div>
                             <div class="flex flex-wrap gap-4 text-neutral-600">
                                 <div class="flex items-center">
                                     <i class="fas fa-calendar-alt mr-2 text-primary"></i>
-                                    <span>Départ : 15 Mars 2024</span>
+                                    <span id="tripDate">Départ : --/--/----</span>
                                 </div>
                                 <div class="flex items-center">
                                     <i class="fas fa-clock mr-2 text-primary"></i>
-                                    <span>Arrivée : 15 Mars 2024 (Soir)</span>
+                                    <span id="tripTime">Arrivée : --/--/----</span>
                                 </div>
                             </div>
                         </div>
@@ -118,14 +176,15 @@
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center">
                                     <div class="w-16 h-16 bg-neutral-200 rounded-full overflow-hidden mr-4 relative">
-                                        <img src="https://picsum.photos/64?random=101" alt="Profil voyageur"
-                                            class="w-full h-full object-cover">
+                                        <img id="tripUserAvatar" src="https://picsum.photos/64?random=101"
+                                            alt="Profil voyageur" class="w-full h-full object-cover">
                                         <div
                                             class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full">
                                         </div>
                                     </div>
                                     <div>
-                                        <h3 class="text-xl font-bold text-neutral-900">Karim Ben Ali</h3>
+                                        <h3 id="tripUserName" class="text-xl font-bold text-neutral-900">Nom du Voyageur
+                                        </h3>
                                         <div class="flex items-center text-sm text-neutral-500 mt-1">
                                             <div class="flex text-yellow-500 mr-2">
                                                 <i class="fas fa-star"></i>
@@ -140,7 +199,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <button
+                                <button onclick="showUserProfile()"
                                     class="hidden md:block text-primary hover:bg-neutral-50 px-4 py-2 rounded-md border border-transparent hover:border-neutral-200 transition">
                                     Voir le profil
                                 </button>
@@ -160,7 +219,7 @@
                                         </div>
                                         <div>
                                             <p class="text-sm text-neutral-500">Capacité disponible</p>
-                                            <p class="font-bold text-neutral-900 text-lg">10 kg</p>
+                                            <p id="tripCapacity" class="font-bold text-neutral-900 text-lg">-- kg</p>
                                         </div>
                                     </div>
                                     <p class="text-xs text-neutral-500 mt-2 pl-13">Peut prendre plusieurs petits colis
@@ -175,7 +234,7 @@
                                         </div>
                                         <div>
                                             <p class="text-sm text-neutral-500">Prix demandé</p>
-                                            <p class="font-bold text-neutral-900 text-lg">Gratuit / Solidarité</p>
+                                            <p id="tripPrice" class="font-bold text-neutral-900 text-lg">-- / --</p>
                                         </div>
                                     </div>
                                     <p class="text-xs text-neutral-500 mt-2 pl-13">Contre service ou symbolique</p>
@@ -184,26 +243,16 @@
 
                             <div class="mb-8">
                                 <h3 class="font-medium text-neutral-900 mb-3">Objets acceptés</h3>
-                                <div class="flex flex-wrap gap-2">
-                                    <span class="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-sm"><i
-                                            class="fas fa-check text-green-500 mr-1"></i> Documents</span>
-                                    <span class="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-sm"><i
-                                            class="fas fa-check text-green-500 mr-1"></i> Vêtements</span>
-                                    <span class="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-sm"><i
-                                            class="fas fa-check text-green-500 mr-1"></i> Médicaments</span>
-                                    <span class="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-sm"><i
-                                            class="fas fa-check text-green-500 mr-1"></i> Petits appareils</span>
+                                <div id="tripItems" class="flex flex-wrap gap-2">
+                                    <!-- Dynamic items -->
                                 </div>
                             </div>
 
                             <div class="mb-6">
                                 <h3 class="font-medium text-neutral-900 mb-3">Description du voyageur</h3>
-                                <div
+                                <div id="tripDescription"
                                     class="bg-neutral-50 p-4 rounded-lg text-neutral-600 leading-relaxed italic border-l-4 border-primary">
-                                    "Bonjour à tous ! Je rentre à Tunis pour voir ma famille. J'ai deux valises et il me
-                                    reste pas mal de place dans l'une d'elles. N'hésitez pas si vous avez des documents
-                                    urgents ou des petits cadeaux à envoyer. Je peux récupérer les objets sur Paris
-                                    centre ou à l'aéroport CDG."
+                                    Aucune description.
                                 </div>
                             </div>
                         </div>
@@ -307,10 +356,152 @@
         </div>
     </footer>
 
+    <!-- Modal Connexion -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-neutral-900">Connexion</h3>
+                <button onclick="closeLoginModal()" class="text-neutral-500 hover:text-neutral-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="mb-4">
+                    <label class="block text-neutral-500 mb-2">Email</label>
+                    <input type="email" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-neutral-500 mb-2">Mot de passe</label>
+                    <input type="password" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-6">
+                    <button type="submit"
+                        class="w-full py-3 bg-primary text-white rounded-md hover:bg-primary-hover transition-colors">
+                        Se connecter
+                    </button>
+                </div>
+
+                <div class="text-center text-neutral-500">
+                    Pas encore de compte ?
+                    <button type="button" onclick="switchToRegister()"
+                        class="text-primary hover:underline font-medium">S'inscrire</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Inscription -->
+    <div id="registerModal"
+        class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-neutral-900">Inscription</h3>
+                <button onclick="closeRegisterModal()" class="text-neutral-500 hover:text-neutral-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="mb-4">
+                    <label class="block text-neutral-500 mb-2">Email</label>
+                    <input type="email" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-neutral-500 mb-2">Mot de passe</label>
+                    <input type="password" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-neutral-500 mb-2">Confirmer le mot de passe</label>
+                    <input type="password" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-neutral-500 mb-2">Nom / Pseudo</label>
+                    <input type="text" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-6">
+                    <button type="submit"
+                        class="w-full py-3 bg-primary text-white rounded-md hover:bg-primary-hover transition-colors">
+                        Créer mon compte
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="../js/data.js"></script>
     <script src="../js/main.js"></script>
     <script>
-        // Custom logic for this page can go here or be extracted
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tripId = urlParams.get('id');
+
+            if (!tripId) {
+                showToast("Voyage introuvable", "error");
+                setTimeout(() => window.location.href = 'index.html', 2000);
+                return;
+            }
+
+            // Ensure data is loaded
+            await JibliData.fetchData({ _id: tripId }); // Should ideally fetch single trip
+            const trip = JibliData.trips.find(t => t.id === tripId || t._id === tripId);
+
+            if (!trip) {
+                showToast("Voyage introuvable ou supprimé", "error");
+                return;
+            }
+
+            // Render Trip Details
+            document.getElementById('tripOrigin').textContent = trip.from;
+            document.getElementById('tripDestination').textContent = trip.to;
+            document.getElementById('tripDate').innerHTML = `<i class="fas fa-calendar-alt mr-2 text-primary"></i>Départ : ${new Date(trip.departureDate).toLocaleDateString()}`;
+            document.getElementById('tripTime').innerHTML = `<i class="fas fa-clock mr-2 text-primary"></i>Arrivée : ${trip.arrivalDate ? new Date(trip.arrivalDate).toLocaleDateString() : 'Non spécifiée'}`;
+            document.getElementById('tripCapacity').textContent = `${trip.maxWeight} kg`;
+            document.getElementById('tripPrice').textContent = trip.priceType === 'free' ? 'Gratuit / Solidarité' : `${trip.price} €/kg`;
+
+            // User info
+            document.getElementById('tripUserName').textContent = trip.userName || 'Utilisateur'; // Fallback if not populated
+            // Note: trip.user might be an ID or object depending on backend population.
+            // Current mock data and seed structure might not fully populate user in list view but logic suggests we might need to fetch user details if separate.
+            // For now assume basic info presence or simple fallback.
+
+            // Description (Simulated if missing in model for now, or use 'size'/'status' as placeholder context)
+            const desc = trip.description || `Voyage de ${trip.size} avec statut ${trip.status}.`;
+            document.getElementById('tripDescription').textContent = `"${desc}"`;
+
+            // Items (Static for now as model doesn't strictly have 'acceptedItems' array yet in seed, but UI assumes it)
+
+            // We can infer or just leave generic
+            const itemsContainer = document.getElementById('tripItems');
+            itemsContainer.innerHTML = `
+                <span class="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-sm"><i class="fas fa-check text-green-500 mr-1"></i> Tout type</span>
+            `;
+
+        });
+
+        function showUserProfile() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tripId = urlParams.get('id');
+            const trip = JibliData.trips.find(t => t.id === tripId || t._id === tripId);
+            if (trip && trip.userId) {
+                window.location.href = `public-profile.html?id=${trip.userId}`;
+            } else {
+                // Fallback if no userId on trip object (mock data issues)
+                window.location.href = `public-profile.html?id=mockUser`;
+            }
+        }
     </script>
 </body>
 

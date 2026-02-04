@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <base target="_self">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails de la demande - Jibli.tn</title>
+    <meta name="description" content="Détails de la demande de transport sur Jibli.tn">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="../css/output.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="min-h-screen bg-neutral-50 font-inter">
+    <!-- Header avec navigation -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <a href="index.html" class="flex items-center" onclick="navigateTo('home')">
+                        <img src="../assets/logos/Jibli.tn.png" alt="Jibli.tn" class="h-12 w-auto object-contain">
+                    </a>
+                </div>
+
+                <div class="hidden md:flex space-x-8">
+                    <a href="index.html" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                        onclick="navigateTo('home')">Accueil</a>
+                    <a href="#" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                        onclick="navigateTo('voyages')">Voyages</a>
+                    <a href="#" class="text-primary font-bold border-b-2 border-primary pb-1"
+                        onclick="navigateTo('demandes')">Demandes</a>
+                    <a href="#" class="text-neutral-500 hover:text-primary font-medium transition-colors"
+                        onclick="navigateTo('dashboard')">Dashboard</a>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <div id="userMenu" class="block">
+                        <button id="userMenuBtn" class="flex items-center space-x-2">
+                            <div class="w-10 h-10 bg-neutral-200 rounded-full overflow-hidden">
+                                <img src="https://picsum.photos/40?random=100" alt="Photo de profil"
+                                    class="w-full h-full object-cover">
+                            </div>
+                            <span class="text-neutral-500 font-medium hidden md:inline">Compte</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="py-12">
+        <div class="container mx-auto px-4">
+            <!-- Breadcrumb -->
+            <nav class="flex mb-8 text-neutral-500 text-sm">
+                <a href="index.html" class="hover:text-primary">Accueil</a>
+                <span class="mx-2">/</span>
+                <a href="recherche.html?type=requests" class="hover:text-primary">Demandes</a>
+                <span class="mx-2">/</span>
+                <span class="text-neutral-900 font-medium" id="breadcrumbCurrent">Détails</span>
+            </nav>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Détails de la demande (Gauche) -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Carte principale -->
+                    <div class="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden">
+                        <!-- En-tête -->
+                        <div class="p-6 border-b border-neutral-200 bg-gradient-to-r from-neutral-50 to-white">
+                            <div class="flex justify-between items-center mb-4">
+                                <h1 id="requestTitle" class="text-2xl md:text-3xl font-bold text-neutral-900">Objet
+                                    demandé</h1>
+                                <span
+                                    class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">En
+                                    attente</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-lg text-neutral-700 font-medium mb-4">
+                                <i class="fas fa-map-marker-alt text-primary"></i>
+                                <span id="requestFrom">Départ</span>
+                                <i class="fas fa-arrow-right text-gray-400 mx-2"></i>
+                                <span id="requestTo">Destination</span>
+                            </div>
+                            <div class="flex items-center text-red-500 font-medium">
+                                <i class="fas fa-hourglass-half mr-2"></i>
+                                <span id="requestDate">Avant le : --/--/----</span>
+                            </div>
+                        </div>
+
+                        <!-- Info Demandeur -->
+                        <div class="p-6 border-b border-neutral-200">
+                            <h2 class="text-lg font-bold text-neutral-900 mb-4">Demandé par</h2>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="w-16 h-16 bg-neutral-200 rounded-full overflow-hidden mr-4 relative">
+                                        <img id="requesterAvatar" src="https://picsum.photos/64?random=99" alt="Profil"
+                                            class="w-full h-full object-cover">
+                                    </div>
+                                    <div>
+                                        <h3 id="requesterName" class="text-xl font-bold text-neutral-900">Nom
+                                            Utilisateur</h3>
+                                        <div class="flex items-center text-sm text-neutral-500 mt-1">
+                                            <i class="fas fa-star text-yellow-500 mr-1"></i>
+                                            <span>4.9 (12 avis)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button onclick="window.location.href='public-profile.html?id=' + currentRequest.userId"
+                                    class="text-primary hover:bg-neutral-50 px-4 py-2 rounded-md border border-transparent hover:border-neutral-200 transition">
+                                    Voir le profil
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Détails Logistiques -->
+                        <div class="p-6">
+                            <h2 class="text-lg font-bold text-neutral-900 mb-6">Détails de l'objet</h2>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                <div class="p-4 bg-neutral-50 rounded-lg border border-neutral-100">
+                                    <p class="text-sm text-neutral-500 mb-1">Poids estimé</p>
+                                    <p id="requestWeight" class="font-bold text-neutral-900 text-lg">-- kg</p>
+                                </div>
+                                <div class="p-4 bg-neutral-50 rounded-lg border border-neutral-100">
+                                    <p class="text-sm text-neutral-500 mb-1">Récompense proposée</p>
+                                    <p id="requestBudget" class="font-bold text-green-600 text-lg">-- €</p>
+                                </div>
+                                <div class="p-4 bg-neutral-50 rounded-lg border border-neutral-100">
+                                    <p class="text-sm text-neutral-500 mb-1">Achat à faire ?</p>
+                                    <p id="requestBuy" class="font-bold text-neutral-900 text-lg">Non</p>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <h3 class="font-medium text-neutral-900 mb-3">Description</h3>
+                                <div id="requestDescription"
+                                    class="bg-neutral-50 p-4 rounded-lg text-neutral-600 leading-relaxed italic border-l-4 border-primary">
+                                    Aucune description.
+                                </div>
+                            </div>
+
+                            <!-- Placeholder Images -->
+                            <!-- <div class="grid grid-cols-4 gap-4">
+                                <div class="bg-gray-200 h-24 rounded-lg"></div>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panneau d'action (Droite) -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 sticky top-24">
+                        <h2 class="text-lg font-bold text-neutral-900 mb-4">Vous pouvez aider ?</h2>
+                        <div class="space-y-4">
+                            <button onclick="proposeTrip()"
+                                class="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary-hover transition-all shadow-md transform hover:-translate-y-1">
+                                <i class="fas fa-hand-holding-heart mr-2"></i> Proposer un trajet
+                            </button>
+                            <button onclick="contactRequester()"
+                                class="w-full py-3 bg-white border border-neutral-300 text-neutral-700 rounded-lg hover:bg-neutral-50 transition-colors">
+                                <i class="fas fa-comment-alt mr-2"></i> Contacter
+                            </button>
+                            <button
+                                class="w-full py-3 bg-white border border-neutral-300 text-neutral-700 rounded-lg hover:bg-neutral-50 transition-colors">
+                                <i class="far fa-heart mr-2"></i> Sauvegarder
+                            </button>
+                        </div>
+
+                        <div class="mt-6 pt-6 border-t border-neutral-100 text-sm text-neutral-500">
+                            <p><i class="fas fa-info-circle mr-1"></i> Ne transférez jamais d'argent hors de la
+                                plateforme avant la livraison.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-neutral-900 text-white py-12 mt-auto">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2024 Jibli.tn</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <!-- Modal Connexion -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-neutral-900">Connexion</h3>
+                <button onclick="closeLoginModal()" class="text-neutral-500 hover:text-neutral-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="mb-4">
+                    <label class="block text-neutral-500 mb-2">Email</label>
+                    <input type="email" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-neutral-500 mb-2">Mot de passe</label>
+                    <input type="password" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-6">
+                    <button type="submit"
+                        class="w-full py-3 bg-primary text-white rounded-md hover:bg-primary-hover transition-colors">
+                        Se connecter
+                    </button>
+                </div>
+
+                <div class="text-center text-neutral-500">
+                    Pas encore de compte ?
+                    <button type="button" onclick="switchToRegister()"
+                        class="text-primary hover:underline font-medium">S'inscrire</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Inscription -->
+    <div id="registerModal"
+        class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-neutral-900">Inscription</h3>
+                <button onclick="closeRegisterModal()" class="text-neutral-500 hover:text-neutral-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="mb-4">
+                    <label class="block text-neutral-500 mb-2">Email</label>
+                    <input type="email" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-neutral-500 mb-2">Mot de passe</label>
+                    <input type="password" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-neutral-500 mb-2">Confirmer le mot de passe</label>
+                    <input type="password" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-neutral-500 mb-2">Nom / Pseudo</label>
+                    <input type="text" required
+                        class="w-full px-4 py-2 border border-neutral-200 rounded-md focus:outline-none focus:border-primary">
+                </div>
+
+                <div class="mb-6">
+                    <button type="submit"
+                        class="w-full py-3 bg-primary text-white rounded-md hover:bg-primary-hover transition-colors">
+                        Créer mon compte
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/data.js"></script>
+    <script src="../js/main.js"></script>
+    <script>
+        let currentRequest = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const requestId = urlParams.get('id');
+
+            if (!requestId) {
+                // Remove redirect for development/demo purposes if needed, or keep strictly
+                window.location.href = 'recherche.html?type=requests';
+                return;
+            }
+
+            // Fetch Request
+            // Ensuring data presence from mock or API
+            await JibliData.fetchData();
+            currentRequest = JibliData.requests.find(r => r.id === requestId || r._id === requestId);
+
+            if (!currentRequest) {
+                alert("Demande introuvable");
+                return;
+            }
+
+            // Fill Data
+            document.getElementById('requestTitle').textContent = currentRequest.item;
+            document.getElementById('requestFrom').textContent = "Ville de départ (Non spécifié)"; // Requests usually have 'location' (Target) but origin is context dependent. Usually 'From any relevant location' to 'Target'.
+            // In current data structure for requests: { item, location (Target), ... }
+            // Let's assume requestFrom is "Partout" or implicity defined by description. Or maybe we re-read structure.
+            document.getElementById('requestFrom').textContent = "Expéditeur (Partout)";
+            document.getElementById('requestTo').textContent = currentRequest.location;
+
+            document.getElementById('requestDate').innerHTML = `<i class="fas fa-hourglass-half mr-2"></i>Avant le : ${currentRequest.date ? new Date(currentRequest.date).toLocaleDateString() : 'Non spécifié'}`;
+
+            document.getElementById('requesterName').textContent = currentRequest.userName || "Utilisateur";
+            document.getElementById('requestWeight').textContent = (currentRequest.weight || "--") + " kg";
+            document.getElementById('requestBudget').textContent = (currentRequest.budget || "--") + " €";
+            document.getElementById('requestDescription').textContent = currentRequest.description;
+
+            document.getElementById('breadcrumbCurrent').textContent = currentRequest.item;
+        });
+
+        function proposeTrip() {
+            if (!appData.currentUser) {
+                showLoginModal();
+                return;
+            }
+            // Logic to show modal listing user trips or create new
+            alert("Fonctionnalité 'Proposer un trajet' à venir !");
+        }
+
+        function contactRequester() {
+            if (!appData.currentUser) {
+                showLoginModal();
+                return;
+            }
+            alert("Ouverture messagerie avec " + currentRequest.userName);
+        }
+    </script>
+</body>
+
+</html>

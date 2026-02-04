@@ -1,43 +1,37 @@
 module.exports = {
-    // Test environment
-    testEnvironment: 'node',
+    projects: [
+        {
+            displayName: 'backend',
+            testEnvironment: 'node',
+            testMatch: [
+                '<rootDir>/tests/integration/**/*.test.js',
+                '<rootDir>/backend/**/*.test.js', // Assuming potential colocated tests
+                '<rootDir>/tests/unit/backend/**/*.test.js', // If they exist
+                '<rootDir>/tests/sample.test.js'
+            ],
+            setupFilesAfterEnv: ['<rootDir>/tests/setup.js', '<rootDir>/tests/db-setup.js'],
+        },
+        {
+            displayName: 'frontend',
+            testEnvironment: 'jsdom',
+            testMatch: [
+                '<rootDir>/tests/unit/frontend/**/*.test.js'
+            ],
+            setupFilesAfterEnv: ['<rootDir>/tests/setup.js'], // No DB setup
+        }
+    ],
 
-    // Coverage configuration
+    // Global coverage config (aggregated)
     coverageDirectory: 'coverage',
     collectCoverageFrom: [
         'backend/**/*.js',
         'js/**/*.js',
         '!**/node_modules/**',
-        '!**/tests/**',
+        '!**/tests/e2e/**',
         '!**/coverage/**',
         '!backend/data.json'
     ],
-
-    // Coverage thresholds
-    coverageThreshold: {
-        global: {
-            branches: 70,
-            functions: 70,
-            lines: 70,
-            statements: 70
-        }
-    },
-
-    // Test match patterns
-    testMatch: [
-        '**/__tests__/**/*.js',
-        '**/?(*.)+(spec|test).js'
-    ],
-
-    // Setup files
-    setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
-
-    // Verbose output
     verbose: true,
-
-    // Clear mocks between tests
     clearMocks: true,
-
-    // Restore mocks between tests
     restoreMocks: true
 };

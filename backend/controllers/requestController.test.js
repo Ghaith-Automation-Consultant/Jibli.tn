@@ -1,7 +1,7 @@
+const Request = require('../models/Request');
 const requestController = require('./requestController');
-const db = require('../db');
 
-jest.mock('../db');
+jest.mock('../models/Request');
 
 describe('RequestController', () => {
     let req, res;
@@ -16,39 +16,45 @@ describe('RequestController', () => {
     });
 
     describe('getAllRequests', () => {
-        test('should return all requests', () => {
+        test('should return all requests', async () => {
             const mockRequests = [
                 { id: 1, item: 'Médicaments', location: 'Tunis' },
                 { id: 2, item: 'Électronique', location: 'Sousse' }
             ];
 
-            db.getAll.mockReturnValue(mockRequests);
+            Request.find.mockResolvedValue(mockRequests);
 
-            requestController.getAllRequests(req, res);
+            await requestController.getAllRequests(req, res);
 
-            expect(db.getAll).toHaveBeenCalledWith('requests');
+            expect(Request.find).toHaveBeenCalled();
             expect(res.json).toHaveBeenCalledWith(mockRequests);
+        });
+
+        test('should return 500 on server error', async () => {
+            Request.find.mockRejectedValue(new Error('DB Error'));
+            await requestController.getAllRequests(req, res);
+            expect(res.status).toHaveBeenCalledWith(500);
         });
     });
 
     describe('getRequestById', () => {
-        test('should return request by id', () => {
+        test('should return request by id', async () => {
             const mockRequest = { id: 1, item: 'Médicaments', location: 'Tunis' };
             req.params.id = '1';
 
-            db.getAll.mockReturnValue([mockRequest]);
+            Request.findById.mockResolvedValue(mockRequest);
 
-            requestController.getRequestById(req, res);
+            await requestController.getRequestById(req, res);
 
-            expect(db.getAll).toHaveBeenCalledWith('requests');
+            expect(Request.findById).toHaveBeenCalledWith('1');
             expect(res.json).toHaveBeenCalledWith(mockRequest);
         });
 
-        test('should return 404 if request not found', () => {
+        test('should return 404 if request not found', async () => {
             req.params.id = '999';
-            db.getAll.mockReturnValue([]);
+            Request.findById.mockResolvedValue(null);
 
-            requestController.getRequestById(req, res);
+            await requestController.getRequestById(req, res);
 
             expect(res.status).toHaveBeenCalledWith(404);
             expect(res.json).toHaveBeenCalledWith({ error: 'Request not found' });
@@ -56,7 +62,7 @@ describe('RequestController', () => {
     });
 
     describe('createRequest', () => {
-        test('should create request with valid data', () => {
+        test('should create request with valid data', async () => {
             const requestData = {
                 item: 'Médicaments',
                 location: 'Tunis',
@@ -67,47 +73,49 @@ describe('RequestController', () => {
             req.body = requestData;
 
             const createdRequest = { id: 1, ...requestData };
-            db.add.mockReturnValue(createdRequest);
+            // Mock instance save
+            const mockSave = jest.fn().mockResolvedValue(createdRequest);
+            Request.mockImplementation(() => ({ save: mockSave }));
 
-            requestController.createRequest(req, res);
+            await requestController.createRequest(req, res);
 
-            expect(db.add).toHaveBeenCalledWith('requests', requestData);
+            expect(Request).toHaveBeenCalledWith(requestData);
+            expect(mockSave).toHaveBeenCalled();
             expect(res.status).toHaveBeenCalledWith(201);
             expect(res.json).toHaveBeenCalledWith(createdRequest);
         });
 
-        test('should return 400 if item is missing', () => {
+        test('should return 400 if item is missing', async () => {
             req.body = { location: 'Tunis' };
 
-            requestController.createRequest(req, res);
+            await requestController.createRequest(req, res);
 
             expect(res.status).toHaveBeenCalledWith(400);
             expect(res.json).toHaveBeenCalledWith({ error: 'Missing item name' });
-            expect(db.add).not.toHaveBeenCalled();
         });
     });
 
     describe('updateRequest', () => {
-        test('should update request successfully', () => {
+        test('should update request successfully', async () => {
             req.params.id = '1';
             req.body = { item: 'Updated Item' };
 
             const updatedRequest = { id: 1, item: 'Updated Item', location: 'Tunis' };
-            db.update.mockReturnValue(updatedRequest);
+            Request.findByIdAndUpdate.mockResolvedValue(updatedRequest);
 
-            requestController.updateRequest(req, res);
+            await requestController.updateRequest(req, res);
 
-            expect(db.update).toHaveBeenCalledWith('requests', '1', req.body);
+            expect(Request.findByIdAndUpdate).toHaveBeenCalledWith('1', req.body, { new: true });
             expect(res.json).toHaveBeenCalledWith(updatedRequest);
         });
 
-        test('should return 404 if request not found', () => {
+        test('should return 404 if request not found', async () => {
             req.params.id = '999';
             req.body = { item: 'Updated Item' };
 
-            db.update.mockReturnValue(null);
+            Request.findByIdAndUpdate.mockResolvedValue(null);
 
-            requestController.updateRequest(req, res);
+            await requestController.updateRequest(req, res);
 
             expect(res.status).toHaveBeenCalledWith(404);
             expect(res.json).toHaveBeenCalledWith({ error: 'Request not found' });
@@ -115,21 +123,21 @@ describe('RequestController', () => {
     });
 
     describe('deleteRequest', () => {
-        test('should delete request successfully', () => {
+        test('should delete request successfully', async () => {
             req.params.id = '1';
-            db.remove.mockReturnValue(true);
+            Request.findByIdAndDelete.mockResolvedValue({ id: 1 });
 
-            requestController.deleteRequest(req, res);
+            await requestController.deleteRequest(req, res);
 
-            expect(db.remove).toHaveBeenCalledWith('requests', '1');
+            expect(Request.findByIdAndDelete).toHaveBeenCalledWith('1');
             expect(res.json).toHaveBeenCalledWith({ message: 'Request deleted' });
         });
 
-        test('should return 404 if request not found', () => {
+        test('should return 404 if request not found', async () => {
             req.params.id = '999';
-            db.remove.mockReturnValue(false);
+            Request.findByIdAndDelete.mockResolvedValue(null);
 
-            requestController.deleteRequest(req, res);
+            await requestController.deleteRequest(req, res);
 
             expect(res.status).toHaveBeenCalledWith(404);
             expect(res.json).toHaveBeenCalledWith({ error: 'Request not found' });
