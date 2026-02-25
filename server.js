@@ -1,6 +1,8 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 
 // Route Imports
 // Route Imports
@@ -18,9 +20,12 @@ if (process.env.NODE_ENV !== 'test') {
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(cors());
+app.use(cors({
+    origin: process.env.NODE_ENV === 'production' ? 'https://yourdomain.com' : 'http://localhost:3000',
+    credentials: true // allow sending cookies
+}));
 app.use(bodyParser.json());
+app.use(cookieParser());
 app.use(express.static('pages')); // Serve static files from pages (temp)
 app.use('/js', express.static('js'));
 app.use('/css', express.static('css'));

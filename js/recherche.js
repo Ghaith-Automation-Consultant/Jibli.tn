@@ -306,8 +306,6 @@ function sortData(data, sortType, type = 'trip') {
 }
 
 function filterTrips(trips) {
-    // Client-side generic text filter if needed (e.g. searching within results)
-    // But mainly handling sort here
     let result = trips;
     if (searchState.filters.query) {
         const terms = searchState.filters.query.split(' ').filter(t => t.length > 0).map(t => t.toLowerCase());
@@ -318,6 +316,14 @@ function filterTrips(trips) {
             });
         }
     }
+
+    // Advanced Sidebar Filters
+    if (searchState.filters.price === 'free') {
+        result = result.filter(trip => trip.priceType === 'free');
+    } else if (searchState.filters.price === 'paid') {
+        result = result.filter(trip => trip.priceType === 'paid');
+    }
+
     return sortData(result, searchState.filters.sort, 'trip');
 }
 
@@ -356,11 +362,21 @@ function toggleAdvancedFiltersRequests() {
 }
 
 function applyFilters() {
-    // Implement detailed filtering logic here if needed
-    alert("Filtres appliqués (Simulation)");
+    const priceFilter = document.querySelector('input[name="priceFilter"]:checked');
+    if (priceFilter) {
+        searchState.filters.price = priceFilter.value;
+    }
+
     updateSearchResults();
+    if (typeof showToast === 'function') {
+        showToast("Filtres appliqués", "info");
+    }
 }
 
 // Fallback functions
-function contactTraveler(id) { alert('Contact traveler ' + id); }
-function saveTrip(id) { alert('Save trip ' + id); }
+function contactTraveler(id) {
+    if (typeof showToast === 'function') showToast('Fonctionnalité Messages bientôt disponible.', 'info');
+}
+function saveTrip(id) {
+    if (typeof showToast === 'function') showToast('Voyage sauvegardé.', 'success');
+}

@@ -138,27 +138,37 @@ function handleAvatarUpload(event) {
 }
 
 async function changePassword() {
+    event.preventDefault(); // Ensure we don't reload if it's in a form
     const oldPassword = document.getElementById('oldPassword').value;
     const newPassword = document.getElementById('newPassword').value;
+    const btn = document.querySelector('#passwordForm button[type="submit"]') || document.querySelector('#passwordForm button');
+    const originalText = btn ? btn.innerHTML : 'Mettre à jour le mot de passe';
 
-    if (!newPassword || newPassword.length < 6) {
-        alert("Le nouveau mot de passe doit contenir au moins 6 caractères.");
+    if (!oldPassword || !newPassword) {
+        showToast("Veuillez remplir tous les champs.", "error");
         return;
     }
 
-    // Ideally use specific endpoint, but for now using updateMe (User.js logic might need adjustment to verify old password)
-    // Security Note: Updating password directly without old password verification is risky. 
-    // Typically we'd use PUT /api/users/me/password with { oldPassword, newPassword }
-    // Since we don't have that endpoint implemented fully in backend yet (just basic update), we'll simulate.
+    if (newPassword.length < 12) {
+        showToast("Le nouveau mot de passe doit comporter au moins 12 caractères.", "error");
+        return;
+    }
 
-    // For MVP: Just send new password (assuming flow is authenticated). 
-    // Real implementation should verify old password on backend.
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Mise à jour...';
+    }
 
     try {
-        await JibliData.updateMe({ password: newPassword });
-        alert("Mot de passe modifié avec succès.");
+        await JibliData.changePassword(oldPassword, newPassword);
+        showToast("Mot de passe modifié avec succès.", "success");
         document.getElementById('passwordForm').reset();
     } catch (error) {
-        alert("Erreur lors du changement de mot de passe.");
+        showToast(error.message, "error");
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
     }
 }

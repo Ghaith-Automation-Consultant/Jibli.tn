@@ -10,3 +10,7 @@ global.console = {
 
 // Set test timeout
 jest.setTimeout(30000);
+
+// Set environment variables for tests
+process.env.JWT_SECRET = 'test-secret-key';
+process.env.NODE_ENV = 'test';

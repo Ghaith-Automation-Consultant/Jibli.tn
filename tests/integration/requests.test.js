@@ -2,7 +2,7 @@ const request = require('supertest');
 const app = require('../../server');
 
 describe('Requests API Integration Tests', () => {
-    let authToken;
+    let authCookies;
 
     beforeAll(async () => {
         // Register and login to get auth token
@@ -11,11 +11,15 @@ describe('Requests API Integration Tests', () => {
             .post('/api/auth/register')
             .send({
                 email,
-                password: 'test123456',
+                password: 'Test@123456789',
                 name: 'Request Test User'
             });
+        // Login to get cookies
+        const loginRes = await request(app)
+            .post('/api/auth/login')
+            .send({ email, password: 'Test@123456789' });
 
-        authToken = response.body.user.token;
+        authCookies = loginRes.headers['set-cookie'].map(c => c.split(';')[0]).join('; ');
     });
 
     describe('GET /api/requests', () => {
@@ -33,7 +37,7 @@ describe('Requests API Integration Tests', () => {
         test('should create request with valid data and auth', async () => {
             const response = await request(app)
                 .post('/api/requests')
-                .set('Authorization', `Bearer ${authToken}`)
+                .set('Cookie', authCookies)
                 .send({
                     item: 'Médicaments',
                     description: 'Médicaments spécifiques',
@@ -62,7 +66,7 @@ describe('Requests API Integration Tests', () => {
         test('should return 400 with missing item', async () => {
             const response = await request(app)
                 .post('/api/requests')
-                .set('Authorization', `Bearer ${authToken}`)
+                .set('Cookie', authCookies)
                 .send({
                     location: 'Tunis'
                 });
@@ -74,7 +78,7 @@ describe('Requests API Integration Tests', () => {
         test('should return 400 with negative weight', async () => {
             const response = await request(app)
                 .post('/api/requests')
-                .set('Authorization', `Bearer ${authToken}`)
+                .set('Cookie', authCookies)
                 .send({
                     item: 'Test Item',
                     location: 'Tunis',
@@ -91,7 +95,7 @@ describe('Requests API Integration Tests', () => {
             // Create request first
             const createRes = await request(app)
                 .post('/api/requests')
-                .set('Authorization', `Bearer ${authToken}`)
+                .set('Cookie', authCookies)
                 .send({
                     item: 'Électronique',
                     location: 'Sousse',
@@ -121,7 +125,7 @@ describe('Requests API Integration Tests', () => {
             // Create request first
             const createRes = await request(app)
                 .post('/api/requests')
-                .set('Authorization', `Bearer ${authToken}`)
+                .set('Cookie', authCookies)
                 .send({
                     item: 'Vêtements',
                     location: 'Sfax',
@@ -134,7 +138,7 @@ describe('Requests API Integration Tests', () => {
             // Update it
             const response = await request(app)
                 .put(`/api/requests/${id}`)
-                .set('Authorization', `Bearer ${authToken}`)
+                .set('Cookie', authCookies)
                 .send({
                     budget: 25
                 });
@@ -158,7 +162,7 @@ describe('Requests API Integration Tests', () => {
             // Create request first
             const createRes = await request(app)
                 .post('/api/requests')
-                .set('Authorization', `Bearer ${authToken}`)
+                .set('Cookie', authCookies)
                 .send({
                     item: 'Documents',
                     location: 'Bizerte',
@@ -171,7 +175,7 @@ describe('Requests API Integration Tests', () => {
             // Delete it
             const response = await request(app)
                 .delete(`/api/requests/${id}`)
-                .set('Authorization', `Bearer ${authToken}`);
+                .set('Cookie', authCookies);
 
             expect(response.status).toBe(200);
             expect(response.body.message).toContain('deleted');
@@ -191,10 +195,10 @@ describe('Requests API Integration Tests', () => {
     describe('Request Filtering', () => {
         beforeEach(async () => {
             // Seed some data
-            await request(app).post('/api/requests').set('Authorization', `Bearer ${authToken}`).send({
+            await request(app).post('/api/requests').set('Cookie', authCookies).send({
                 item: 'Laptop', location: 'Tunis', weight: 2, budget: 100
             });
-            await request(app).post('/api/requests').set('Authorization', `Bearer ${authToken}`).send({
+            await request(app).post('/api/requests').set('Cookie', authCookies).send({
                 item: 'Documents', location: 'Sousse', weight: 0.1, budget: 20
             });
         });

@@ -4,7 +4,7 @@ describe('Validation Middleware', () => {
     let req, res, next;
 
     beforeEach(() => {
-        req = { body: {} };
+        req = { body: {}, method: 'POST' };
         res = {
             status: jest.fn().mockReturnThis(),
             json: jest.fn()

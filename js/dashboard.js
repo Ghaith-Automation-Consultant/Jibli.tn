@@ -92,14 +92,26 @@ function switchDashboardTab(tab) {
     }
 }
 
-function renderOverview() {
+async function renderOverview() {
     if (!appData.currentUser) return;
 
     // Stats
     const myTrips = JibliData.trips.filter(t => t.userId === appData.currentUser.id);
     const myRequests = JibliData.requests.filter(r => r.userId === appData.currentUser.id);
-    // Mock unread messages count
-    const unreadCount = 2; // Fixed for MVP
+
+    let unreadCount = 0;
+    try {
+        const conversations = await JibliData.getConversations();
+        unreadCount = conversations.reduce((acc, conv) => {
+            const lastMsg = conv.lastMessage;
+            if (lastMsg && !lastMsg.read && lastMsg.sender !== appData.currentUser.id) {
+                return acc + 1;
+            }
+            return acc;
+        }, 0);
+    } catch (error) {
+        console.error("Failed to fetch conversations for overview", error);
+    }
 
     document.getElementById('statActiveTrips').textContent = myTrips.length;
     document.getElementById('statActiveRequests').textContent = myRequests.length;

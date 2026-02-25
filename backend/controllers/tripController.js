@@ -2,7 +2,7 @@ const Trip = require('../models/Trip');
 
 exports.getAllTrips = async (req, res) => {
     try {
-        const { from, to, date, minWeight, priceType, page = 1, limit = 20 } = req.query;
+        const { from, to, date, minWeight, priceType, page = 1, limit = 20 } = req.query || {};
         const filter = {};
 
         // Filtering
@@ -25,7 +25,7 @@ exports.getAllTrips = async (req, res) => {
             .sort({ departureDate: 1 }) // Sort by date ascending
             .skip(skip)
             .limit(limitNum)
-            .populate('user', 'name location'); // Populate user details
+            .populate('user', 'name location avatar'); // Populate user details
 
         const total = await Trip.countDocuments(filter);
 

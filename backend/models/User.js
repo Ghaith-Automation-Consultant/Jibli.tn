@@ -12,6 +12,8 @@ const userSchema = new mongoose.Schema({
     isEmailVerified: { type: Boolean, default: false },
     isPhoneVerified: { type: Boolean, default: false },
     isIdentityVerified: { type: Boolean, default: false },
+    failedLoginAttempts: { type: Number, default: 0 },
+    lockedUntil: { type: Date },
     reviews: [{
         rating: Number,
         comment: String,

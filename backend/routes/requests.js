@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const requestController = require('../controllers/requestController');
-const { verifyToken } = require('../middleware/auth');
+const { authenticateToken: verifyToken } = require('../middlewares/auth');
 const { validateRequest } = require('../middleware/validation');
 
 router.get('/', requestController.getAllRequests);

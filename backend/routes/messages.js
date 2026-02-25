@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { verifyToken: protect } = require('../middleware/auth'); // Alias verifyToken as protect to match expected usage
+const { authenticateToken: protect } = require('../middlewares/auth'); // Alias verifyToken as protect to match expected usage
 const {
     sendMessage,
     getConversations,

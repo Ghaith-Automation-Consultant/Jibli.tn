@@ -170,8 +170,14 @@ function showForgotPasswordModal() {
 // Gestion des formulaires
 function handleLogin(event) {
     event.preventDefault();
+    const btn = event.target.querySelector('button[type="submit"]');
+    const originalText = btn.innerHTML;
     const email = event.target.querySelector('input[type="email"]').value;
     const password = event.target.querySelector('input[type="password"]').value;
+
+    // Loading state
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Connexion...';
 
     // Connexion API
     JibliData.login(email, password)
@@ -183,11 +189,17 @@ function handleLogin(event) {
         })
         .catch(err => {
             showToast("Erreur de connexion : " + (err.message || "identifiants invalides"), 'error');
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
         });
 }
 
 function handleRegister(event) {
     event.preventDefault();
+    const btn = event.target.querySelector('button[type="submit"]') || event.target.querySelectorAll('button')[event.target.querySelectorAll('button').length - 1];
+    const originalText = btn ? btn.innerHTML : 'S\'inscrire';
     const email = event.target.querySelectorAll('input')[0].value;
     const password = event.target.querySelectorAll('input')[1].value;
     const confirmPassword = event.target.querySelectorAll('input')[2].value;
@@ -196,6 +208,12 @@ function handleRegister(event) {
     if (password !== confirmPassword) {
         showToast("Les mots de passe ne correspondent pas", 'error');
         return;
+    }
+
+    // Loading state
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Inscription...';
     }
 
     // Connexion API
@@ -208,6 +226,12 @@ function handleRegister(event) {
         })
         .catch(err => {
             showToast("Erreur d'inscription : " + err.message, 'error');
+        })
+        .finally(() => {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
         });
 }
 

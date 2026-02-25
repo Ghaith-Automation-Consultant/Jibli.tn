@@ -57,23 +57,21 @@ const JibliData = {
 
     // Token Management
     getToken() {
-        return localStorage.getItem('jibli_token');
+        return localStorage.getItem('jibli_logged_in') === 'true' ? 'cookie_managed' : null;
     },
 
     setToken(token) {
-        localStorage.setItem('jibli_token', token);
+        localStorage.setItem('jibli_logged_in', 'true');
     },
 
     clearToken() {
-        localStorage.removeItem('jibli_token');
+        localStorage.removeItem('jibli_logged_in');
+        fetch('/api/auth/logout', { method: 'POST' }).catch(() => { });
     },
 
     getAuthHeaders() {
         const headers = { 'Content-Type': 'application/json' };
-        const token = this.getToken();
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
+        // We rely on HttpOnly cookies for auth, so no Bearer token needed here
         return headers;
     },
 
@@ -114,12 +112,13 @@ const JibliData = {
         });
         if (!res.ok) {
             const error = await res.json();
-            throw new Error(error.error || 'Login failed');
+            const errorMessage = error.details ? `${error.error}: ${error.details.join(', ')}` : (error.error || 'Login failed');
+            throw new Error(errorMessage);
         }
         const data = await res.json();
-        // Store JWT token
-        if (data.user && data.user.token) {
-            this.setToken(data.user.token);
+        // Set login flag
+        if (data.user) {
+            this.setToken('true');
         }
         return data;
     },
@@ -132,12 +131,13 @@ const JibliData = {
         });
         if (!res.ok) {
             const error = await res.json();
-            throw new Error(error.error || 'Registration failed');
+            const errorMessage = error.details ? `${error.error}: ${error.details.join(', ')}` : (error.error || 'Registration failed');
+            throw new Error(errorMessage);
         }
         const data = await res.json();
-        // Store JWT token
-        if (data.user && data.user.token) {
-            this.setToken(data.user.token);
+        // Set login flag
+        if (data.user) {
+            this.setToken('true');
         }
         return data;
     },
@@ -244,6 +244,25 @@ const JibliData = {
 
     async updateMe(updates) {
         return this.updateUser('me', updates);
+    },
+
+    async changePassword(oldPassword, newPassword) {
+        const res = await fetch('/api/users/me/password', {
+            method: 'PUT',
+            headers: this.getAuthHeaders(),
+            body: JSON.stringify({ oldPassword, newPassword })
+        });
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.error || 'Erreur lors du changement de mot de passe');
+        }
+        return await res.json();
+    },
+
+    async getStats() {
+        const res = await fetch('/api/stats');
+        if (!res.ok) throw new Error('Failed to fetch stats');
+        return await res.json();
     },
 
     // Messaging Methods

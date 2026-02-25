@@ -22,16 +22,26 @@ describe('TripController', () => {
                 { id: 2, from: 'Lyon', to: 'Tunis' }
             ];
 
-            Trip.find.mockResolvedValue(mockTrips);
+            const mockQuery = {
+                sort: jest.fn().mockReturnThis(),
+                skip: jest.fn().mockReturnThis(),
+                limit: jest.fn().mockReturnThis(),
+                populate: jest.fn().mockResolvedValue(mockTrips)
+            };
+            Trip.find.mockReturnValue(mockQuery);
+            Trip.countDocuments = jest.fn().mockResolvedValue(2);
 
             await tripController.getAllTrips(req, res);
 
             expect(Trip.find).toHaveBeenCalled();
-            expect(res.json).toHaveBeenCalledWith(mockTrips);
+            expect(res.json).toHaveBeenCalledWith({
+                data: mockTrips,
+                pagination: { total: 2, page: 1, limit: 20, pages: 1 }
+            });
         });
 
         test('should return 500 on server error', async () => {
-            Trip.find.mockRejectedValue(new Error('DB Error'));
+            Trip.find.mockImplementation(() => { throw new Error('DB Error'); });
             await tripController.getAllTrips(req, res);
             expect(res.status).toHaveBeenCalledWith(500);
         });

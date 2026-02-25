@@ -1,15 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const authController = require('../controllers/authController');
-const { verifyToken, optionalAuth } = require('../middleware/auth');
+const userController = require('../controllers/userController');
+const { authenticateToken } = require('../middlewares/auth');
 
 // Me routes (must be before /:id)
-router.get('/me', verifyToken, authController.getMe);
-router.put('/me', verifyToken, authController.updateMe);
+router.put('/me/password', authenticateToken, userController.changePassword);
+router.get('/me', authenticateToken, userController.getMe);
+router.put('/me', authenticateToken, userController.updateMe);
 
 // Reuse authController functions for user management
-router.get('/:id', optionalAuth, authController.getUser);
-router.put('/:id', verifyToken, authController.updateUser);
-router.delete('/:id', verifyToken, authController.deleteUser);
+router.get('/:id', authenticateToken, userController.getUser);
+router.put('/:id', authenticateToken, userController.updateUser);
+router.delete('/:id', authenticateToken, userController.deleteUser);
 
 module.exports = router;

@@ -9,7 +9,11 @@ const JWT_SECRET = process.env.JWT_SECRET || 'jibli-tn-secret-key-change-in-prod
  */
 const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    let token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+
+    if (!token && req.cookies && req.cookies.access_token) {
+        token = req.cookies.access_token;
+    }
 
     if (!token) {
         return res.status(401).json({ error: 'Access denied. No token provided.' });
@@ -29,7 +33,11 @@ const verifyToken = (req, res, next) => {
  */
 const optionalAuth = (req, res, next) => {
     const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    let token = authHeader && authHeader.split(' ')[1];
+
+    if (!token && req.cookies && req.cookies.access_token) {
+        token = req.cookies.access_token;
+    }
 
     if (token) {
         try {

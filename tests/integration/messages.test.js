@@ -8,16 +8,16 @@ const Message = require('../../backend/models/Message');
 const userOne = {
     name: 'User One',
     email: 'user1@example.com',
-    password: 'password123'
+    password: 'Test@123456789'
 };
 
 const userTwo = {
     name: 'User Two',
     email: 'user2@example.com',
-    password: 'password123'
+    password: 'Test@123456789'
 };
 
-let tokenOne, tokenTwo;
+let cookiesOne, cookiesTwo;
 let userIdOne, userIdTwo;
 
 describe('Messaging API', () => {
@@ -28,18 +28,23 @@ describe('Messaging API', () => {
 
         // Create users
         const res1 = await request(app).post('/api/auth/register').send(userOne);
-        tokenOne = res1.body.user.token;
-        userIdOne = res1.body.user.id;
+        userIdOne = res1.body.user?.id || res1.body.user?._id || (await User.findOne({ email: userOne.email }))._id;
 
         const res2 = await request(app).post('/api/auth/register').send(userTwo);
-        tokenTwo = res2.body.user.token;
-        userIdTwo = res2.body.user.id;
+        userIdTwo = res2.body.user?.id || res2.body.user?._id || (await User.findOne({ email: userTwo.email }))._id;
+
+        // Login to get cookies
+        const loginRes1 = await request(app).post('/api/auth/login').send({ email: userOne.email, password: userOne.password });
+        cookiesOne = loginRes1.headers['set-cookie'].map(c => c.split(';')[0]).join('; ');
+
+        const loginRes2 = await request(app).post('/api/auth/login').send({ email: userTwo.email, password: userTwo.password });
+        cookiesTwo = loginRes2.headers['set-cookie'].map(c => c.split(';')[0]).join('; ');
     });
 
     test('should send a message', async () => {
         const res = await request(app)
             .post('/api/messages')
-            .set('Authorization', `Bearer ${tokenOne}`)
+            .set('Cookie', cookiesOne)
             .send({
                 receiverId: userIdTwo,
                 content: 'Hello User Two'
@@ -47,8 +52,8 @@ describe('Messaging API', () => {
 
         expect(res.status).toBe(201);
         expect(res.body.content).toBe('Hello User Two');
-        expect(res.body.sender.id || res.body.sender._id || res.body.sender).toBe(userIdOne);
-        expect(res.body.receiver.id || res.body.receiver._id || res.body.receiver).toBe(userIdTwo);
+        expect(String(res.body.sender.id || res.body.sender._id || res.body.sender)).toBe(String(userIdOne));
+        expect(String(res.body.receiver.id || res.body.receiver._id || res.body.receiver)).toBe(String(userIdTwo));
 
         // Check DB
         const msg = await Message.findById(res.body._id);
@@ -60,19 +65,19 @@ describe('Messaging API', () => {
         // Send message from 1 to 2
         await request(app)
             .post('/api/messages')
-            .set('Authorization', `Bearer ${tokenOne}`)
+            .set('Cookie', cookiesOne)
             .send({ receiverId: userIdTwo, content: 'Hi from 1' });
 
         // Send message from 2 to 1
         await request(app)
             .post('/api/messages')
-            .set('Authorization', `Bearer ${tokenTwo}`)
+            .set('Cookie', cookiesTwo)
             .send({ receiverId: userIdOne, content: 'Hello back' });
 
         // Get messages as User 1
         const res = await request(app)
             .get(`/api/messages/${userIdTwo}`)
-            .set('Authorization', `Bearer ${tokenOne}`);
+            .set('Cookie', cookiesOne);
 
         expect(res.status).toBe(200);
         expect(res.body.length).toBe(2);
@@ -84,16 +89,16 @@ describe('Messaging API', () => {
         // 1 talks to 2
         await request(app)
             .post('/api/messages')
-            .set('Authorization', `Bearer ${tokenOne}`)
+            .set('Cookie', cookiesOne)
             .send({ receiverId: userIdTwo, content: 'First msg' });
 
         const res = await request(app)
             .get('/api/messages/conversations')
-            .set('Authorization', `Bearer ${tokenOne}`);
+            .set('Cookie', cookiesOne);
 
         expect(res.status).toBe(200);
         expect(res.body.length).toBe(1);
-        expect(res.body[0].partner.id || res.body[0].partner._id).toBe(userIdTwo);
+        expect(String(res.body[0].partner.id || res.body[0].partner._id)).toBe(String(userIdTwo));
         expect(res.body[0].lastMessage.content).toBe('First msg');
     });
 
@@ -101,7 +106,7 @@ describe('Messaging API', () => {
         // 1 sends to 2
         const msgRes = await request(app)
             .post('/api/messages')
-            .set('Authorization', `Bearer ${tokenOne}`)
+            .set('Cookie', cookiesOne)
             .send({ receiverId: userIdTwo, content: 'Unread msg' });
 
         // Check unread
@@ -111,7 +116,7 @@ describe('Messaging API', () => {
         // 2 reads it
         const res = await request(app)
             .put(`/api/messages/${userIdOne}/read`)
-            .set('Authorization', `Bearer ${tokenTwo}`);
+            .set('Cookie', cookiesTwo);
 
         expect(res.status).toBe(200);
 

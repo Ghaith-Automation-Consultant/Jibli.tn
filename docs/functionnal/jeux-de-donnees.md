@@ -6,10 +6,12 @@ Ce document décrit les jeux de données injectés dans la base de données (`ba
 
 | Nom | Email | Mot de passe | Rôle / Profil | Localisation |
 | :--- | :--- | :--- | :--- | :--- |
-| **Karim Voyageur** | `karim@test.com` | `123456` | **Voyageur Fréquent** (Vérifié). Fait souvent la navette Lyon-Tunis. | Lyon, FR |
-| **Leila Urgent** | `leila@test.com` | `123456` | **Expéditeur "Besoin Urgent"**. Cherche souvent des médicaments ou pièces. | Tunis, TN |
-| **Sami Etudiant** | `sami@test.com` | `123456` | **Étudiant / Budget Serré**. Cherche des trajets gratuits/solidaires. | Paris, FR |
-| **Alice Martin** | `alice@test.com` | `123456` | **Utilisateur Standard**. Utilisation occasionnelle. | Marseille, FR |
+| **Karim Voyageur** | `karim@test.com` | `Test@123456789` | **Voyageur Fréquent** (Vérifié). Fait souvent la navette Lyon-Tunis. | Lyon, FR |
+| **Leila Urgent** | `leila@test.com` | `Test@123456789` | **Expéditeur "Besoin Urgent"**. Cherche souvent des médicaments ou pièces. | Tunis, TN |
+| **Sami Etudiant** | `sami@test.com` | `Test@123456789` | **Étudiant / Budget Serré**. Cherche des trajets gratuits/solidaires. | Paris, FR |
+| **Alice Martin** | `alice@test.com` | `Test@123456789` | **Utilisateur Standard**. Utilisation occasionnelle. | Marseille, FR |
+| **Moncef Pro** | `moncef@test.com` | `Test@123456789` | **Transporteur Professionnel**. Effectue des livraisons de haute valeur avec garantie. | Paris, FR |
+| **Nour Artisanat** | `nour@test.com` | `Test@123456789` | **Petite Commerçante**. Envoie régulièrement des produits locaux vers l'Europe. | Sousse, TN |
 
 ## 2. Scénarios (Use Cases)
 
@@ -33,6 +35,19 @@ Ce document décrit les jeux de données injectés dans la base de données (`ba
 *   **Données** :
     *   **Voyage** : Tunis -> Lyon (Dans 20 jours), Payant (15€/kg).
 
+### Scénario D : Transport Sécurisé (Haute Valeur)
+*   **Contexte** : Alice veut envoyer un ordinateur portable très cher (MacBook) à sa famille à Tunis en toute sécurité.
+*   **Action** : Elle confie l'objet à Moncef, un voyageur professionnel très bien évalué.
+*   **Données** :
+    *   **Voyage** : Paris -> Tunis (Dans 15 jours), Transport de valeur sécurisé (25€/kg).
+    *   **Demande** : "MacBook Pro", Envoi fragile et précieux, 2.5kg.
+
+### Scénario E : Export d'Artisanat Local
+*   **Contexte** : Nour vend des produits d'artisanat tunisiens et a besoin d'envoyer une commande importante en France.
+*   **Données** :
+    *   **Voyage** : Sousse -> Paris (Dans 7 jours), 30kg dispo.
+    *   **Demande** : "Tapis et Céramiques Traditionnels", Encombrant (15kg).
+
 ## 3. Données Techniques
 
 ### Voyages (Trips)
@@ -40,11 +55,15 @@ Ce document décrit les jeux de données injectés dans la base de données (`ba
 2.  **Tunis -> Lyon** (Karim) : Actif, Payant, Moyen (10kg).
 3.  **Paris -> Sfax** (Sami) : Actif, Gratuit, Léger (5kg).
 4.  **Marseille -> Tunis** (Alice) : **Terminé** (Passé), servira pour l'historique.
+5.  **Paris -> Tunis** (Moncef) : Actif, Sécurisé/Garantie, Standard (50kg).
+6.  **Sousse -> Paris** (Nour) : Actif, Commercial, Lourd (30kg).
 
 ### Demandes (Requests)
 1.  **Médicaments** (Leila) : Tunis, Urgent.
 2.  **Livres Scolaires** (Sami) : Paris, Standard.
 3.  **Parfum** (Alice) : Marseille, Standard.
+4.  **PC Portable MacBook** (Alice) : Paris, Fragile/Valeur.
+5.  **Tapis et Céramiques** (Nour) : Sousse, Encombrant.
 
 ## 4. Instructions de Mise à jour
 Pour réinitialiser la base de données avec ces données :

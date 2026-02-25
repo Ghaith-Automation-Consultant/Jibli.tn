@@ -2,7 +2,7 @@ const request = require('supertest');
 const app = require('../../server');
 
 describe('Trips API Integration Tests', () => {
-    let authToken;
+    let authCookies;
 
     beforeAll(async () => {
         // Register and login to get auth token
@@ -11,11 +11,15 @@ describe('Trips API Integration Tests', () => {
             .post('/api/auth/register')
             .send({
                 email,
-                password: 'test123456',
+                password: 'Test@123456789',
                 name: 'Trip Test User'
             });
+        // Login to get cookies
+        const loginRes = await request(app)
+            .post('/api/auth/login')
+            .send({ email, password: 'Test@123456789' });
 
-        authToken = response.body.user.token;
+        authCookies = loginRes.headers['set-cookie'].map(c => c.split(';')[0]).join('; ');
     });
 
     describe('GET /api/trips', () => {
@@ -33,7 +37,7 @@ describe('Trips API Integration Tests', () => {
         test('should create trip with valid data and auth', async () => {
             const response = await request(app)
                 .post('/api/trips')
-                .set('Authorization', `Bearer ${authToken}`)
+                .set('Cookie', authCookies)
                 .send({
                     from: 'Paris',
                     to: 'Tunis',
@@ -43,6 +47,9 @@ describe('Trips API Integration Tests', () => {
                     priceType: 'free'
                 });
 
+            if (response.status !== 201) {
+                console.error("DEBUG RESPONSE:", response.body);
+            }
             expect(response.status).toBe(201);
             expect(response.body).toHaveProperty('id');
             expect(response.body.from).toBe('Paris');
@@ -64,7 +71,7 @@ describe('Trips API Integration Tests', () => {
         test('should return 400 with missing required fields', async () => {
             const response = await request(app)
                 .post('/api/trips')
-                .set('Authorization', `Bearer ${authToken}`)
+                .set('Cookie', authCookies)
                 .send({
                     from: 'Paris'
                     // Missing 'to' and 'departureDate'
@@ -77,7 +84,7 @@ describe('Trips API Integration Tests', () => {
         test('should return 400 with invalid date', async () => {
             const response = await request(app)
                 .post('/api/trips')
-                .set('Authorization', `Bearer ${authToken}`)
+                .set('Cookie', authCookies)
                 .send({
                     from: 'Paris',
                     to: 'Tunis',
@@ -94,7 +101,7 @@ describe('Trips API Integration Tests', () => {
             // First create a trip
             const createRes = await request(app)
                 .post('/api/trips')
-                .set('Authorization', `Bearer ${authToken}`)
+                .set('Cookie', authCookies)
                 .send({
                     from: 'Lyon',
                     to: 'Tunis',
@@ -124,7 +131,7 @@ describe('Trips API Integration Tests', () => {
             // Create trip first
             const createRes = await request(app)
                 .post('/api/trips')
-                .set('Authorization', `Bearer ${authToken}`)
+                .set('Cookie', authCookies)
                 .send({
                     from: 'Marseille',
                     to: 'Tunis',
@@ -137,7 +144,7 @@ describe('Trips API Integration Tests', () => {
             // Update it
             const response = await request(app)
                 .put(`/api/trips/${id}`)
-                .set('Authorization', `Bearer ${authToken}`)
+                .set('Cookie', authCookies)
                 .send({
                     maxWeight: 20
                 });
@@ -161,7 +168,7 @@ describe('Trips API Integration Tests', () => {
             // Create trip first
             const createRes = await request(app)
                 .post('/api/trips')
-                .set('Authorization', `Bearer ${authToken}`)
+                .set('Cookie', authCookies)
                 .send({
                     from: 'Nice',
                     to: 'Tunis',
@@ -174,7 +181,7 @@ describe('Trips API Integration Tests', () => {
             // Delete it
             const response = await request(app)
                 .delete(`/api/trips/${id}`)
-                .set('Authorization', `Bearer ${authToken}`);
+                .set('Cookie', authCookies);
 
             expect(response.status).toBe(200);
             expect(response.body.message).toContain('deleted');
@@ -194,13 +201,13 @@ describe('Trips API Integration Tests', () => {
     describe('Trip Filtering', () => {
         beforeEach(async () => {
             // Seed some data for filtering
-            await request(app).post('/api/trips').set('Authorization', `Bearer ${authToken}`).send({
+            await request(app).post('/api/trips').set('Cookie', authCookies).send({
                 from: 'Paris', to: 'Tunis', departureDate: '2024-06-01', maxWeight: 10, priceType: 'free'
             });
-            await request(app).post('/api/trips').set('Authorization', `Bearer ${authToken}`).send({
+            await request(app).post('/api/trips').set('Cookie', authCookies).send({
                 from: 'Lyon', to: 'Oran', departureDate: '2024-07-01', maxWeight: 5, priceType: 'paid'
             });
-            await request(app).post('/api/trips').set('Authorization', `Bearer ${authToken}`).send({
+            await request(app).post('/api/trips').set('Cookie', authCookies).send({
                 from: 'Marseille', to: 'Tunis', departureDate: '2024-08-01', maxWeight: 20, priceType: 'free'
             });
         });

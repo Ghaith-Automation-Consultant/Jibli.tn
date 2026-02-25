@@ -1,9 +1,21 @@
 const express = require('express');
-const router = express.Router();
-const authController = require('../controllers/authController');
-const { validateUser } = require('../middleware/validation');
+const { register, login, refresh, logout } = require('../controllers/auth');
+const { loginLimiter, apiLimiter } = require('../config/rateLimit');
+const { authenticateToken } = require('../middlewares/auth');
 
-router.post('/login', validateUser, authController.login);
-router.post('/register', validateUser, authController.register);
+const router = express.Router();
+
+// Public routes with specific rate limits
+router.post('/register', apiLimiter, register);
+router.post('/login', loginLimiter, login);
+router.post('/refresh', apiLimiter, refresh);
+
+// Protected route to logout securely
+router.post('/logout', authenticateToken, logout);
+
+// Sample protected route to test auth
+router.get('/me', authenticateToken, (req, res) => {
+    res.json({ message: 'Authentication successful', user: req.user });
+});
 
 module.exports = router;

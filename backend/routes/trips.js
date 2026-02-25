@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const tripController = require('../controllers/tripController');
-const { verifyToken } = require('../middleware/auth');
+const { authenticateToken: verifyToken } = require('../middlewares/auth');
 const { validateTrip } = require('../middleware/validation');
 
 router.get('/', tripController.getAllTrips);

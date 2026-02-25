@@ -2,7 +2,7 @@ const request = require('supertest');
 const app = require('../../server'); // Import the Express app
 
 describe('Auth API Integration Tests', () => {
-    let authToken;
+    let authCookies;
     let userId;
 
     describe('POST /api/auth/register', () => {
@@ -13,20 +13,15 @@ describe('Auth API Integration Tests', () => {
                 .post('/api/auth/register')
                 .send({
                     email: uniqueEmail,
-                    password: 'test123456',
+                    password: 'Test@123456789',
                     name: 'Integration Test User'
                 });
 
             expect(response.status).toBe(201);
-            expect(response.body).toHaveProperty('user');
-            expect(response.body.user).toHaveProperty('token');
-            expect(response.body.user).toHaveProperty('id');
-            expect(response.body.user.email).toBe(uniqueEmail);
-            expect(response.body.user.password).toBeUndefined();
+            expect(response.body).toHaveProperty('message');
+            expect(response.body.message).toContain('User registered successfully');
 
-            // Save for later tests
-            authToken = response.body.user.token;
-            userId = response.body.user.id;
+            // Note: In new flow, register doesn't auto-login or return user/token.
         });
 
         test('should return 400 for duplicate email', async () => {
@@ -36,7 +31,7 @@ describe('Auth API Integration Tests', () => {
                 .post('/api/auth/register')
                 .send({
                     email,
-                    password: 'test123456',
+                    password: 'Test@123456789',
                     name: 'First User'
                 });
 
@@ -44,12 +39,12 @@ describe('Auth API Integration Tests', () => {
                 .post('/api/auth/register')
                 .send({
                     email,
-                    password: 'test123456',
+                    password: 'Test@123456789',
                     name: 'Second User'
                 });
 
-            expect(response.status).toBe(400);
-            expect(response.body.error).toContain('already exists');
+            expect(response.status).toBe(409);
+            expect(response.body.error).toContain('Email already in use');
         });
 
         test('should return 400 for invalid email', async () => {
@@ -57,7 +52,7 @@ describe('Auth API Integration Tests', () => {
                 .post('/api/auth/register')
                 .send({
                     email: 'invalid-email',
-                    password: 'test123456',
+                    password: 'Test@123456789',
                     name: 'Test User'
                 });
 
@@ -70,12 +65,12 @@ describe('Auth API Integration Tests', () => {
                 .post('/api/auth/register')
                 .send({
                     email: `test-${Date.now()}@example.com`,
-                    password: '123',
+                    password: 'Short@1',
                     name: 'Test User'
                 });
 
             expect(response.status).toBe(400);
-            expect(response.body.details).toContain('Password must be at least 6 characters long');
+            expect(response.body.error).toContain('Password must be at least 12 characters long');
         });
     });
 
@@ -89,7 +84,7 @@ describe('Auth API Integration Tests', () => {
                 .post('/api/auth/register')
                 .send({
                     email: loginEmail,
-                    password: 'test123456',
+                    password: 'Test@123456789',
                     name: 'Login Test User'
                 });
         });
@@ -99,14 +94,15 @@ describe('Auth API Integration Tests', () => {
                 .post('/api/auth/login')
                 .send({
                     email: loginEmail,
-                    password: 'test123456'
+                    password: 'Test@123456789'
                 });
 
             expect(response.status).toBe(200);
             expect(response.body).toHaveProperty('user');
-            expect(response.body.user).toHaveProperty('token');
             expect(response.body.user.email).toBe(loginEmail);
             expect(response.body.user.password).toBeUndefined();
+            expect(response.headers['set-cookie']).toBeDefined();
+            authCookies = response.headers['set-cookie'].map(c => c.split(';')[0]).join('; ');
         });
 
         test('should return 401 for wrong password', async () => {
@@ -114,7 +110,7 @@ describe('Auth API Integration Tests', () => {
                 .post('/api/auth/login')
                 .send({
                     email: loginEmail,
-                    password: 'wrongpassword'
+                    password: 'Wrong@Password1'
                 });
 
             expect(response.status).toBe(401);
@@ -126,7 +122,7 @@ describe('Auth API Integration Tests', () => {
                 .post('/api/auth/login')
                 .send({
                     email: 'nonexistent@test.com',
-                    password: 'test123456'
+                    password: 'Test@123456789'
                 });
 
             expect(response.status).toBe(401);
@@ -143,19 +139,18 @@ describe('Auth API Integration Tests', () => {
                 .post('/api/auth/register')
                 .send({
                     email,
-                    password: 'test123456',
+                    password: 'Test@123456789',
                     name: 'Full Flow User'
                 });
 
             expect(registerRes.status).toBe(201);
-            const token = registerRes.body.user.token;
 
             // 2. Login
             const loginRes = await request(app)
                 .post('/api/auth/login')
                 .send({
                     email,
-                    password: 'test123456'
+                    password: 'Test@123456789'
                 });
 
             expect(loginRes.status).toBe(200);
@@ -163,7 +158,7 @@ describe('Auth API Integration Tests', () => {
             // 3. Access protected route (create trip)
             const tripRes = await request(app)
                 .post('/api/trips')
-                .set('Authorization', `Bearer ${token}`)
+                .set('Cookie', loginRes.headers['set-cookie'].map(c => c.split(';')[0]).join('; '))
                 .send({
                     from: 'Paris',
                     to: 'Tunis',

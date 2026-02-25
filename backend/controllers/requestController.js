@@ -2,7 +2,7 @@ const Request = require('../models/Request');
 
 exports.getAllRequests = async (req, res) => {
     try {
-        const { query, location, date, maxBudget, page = 1, limit = 20 } = req.query;
+        const { query, location, date, maxBudget, page = 1, limit = 20 } = req.query || {};
         const filter = {};
 
         // Filtering
@@ -27,7 +27,7 @@ exports.getAllRequests = async (req, res) => {
             .sort({ createdAt: -1 }) // Newest first
             .skip(skip)
             .limit(limitNum)
-            .populate('user', 'name location');
+            .populate('user', 'name location avatar');
 
         const total = await Request.countDocuments(filter);
 

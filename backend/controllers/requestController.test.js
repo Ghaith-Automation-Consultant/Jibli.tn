@@ -22,16 +22,26 @@ describe('RequestController', () => {
                 { id: 2, item: 'Électronique', location: 'Sousse' }
             ];
 
-            Request.find.mockResolvedValue(mockRequests);
+            const mockQuery = {
+                sort: jest.fn().mockReturnThis(),
+                skip: jest.fn().mockReturnThis(),
+                limit: jest.fn().mockReturnThis(),
+                populate: jest.fn().mockResolvedValue(mockRequests)
+            };
+            Request.find.mockReturnValue(mockQuery);
+            Request.countDocuments = jest.fn().mockResolvedValue(2);
 
             await requestController.getAllRequests(req, res);
 
             expect(Request.find).toHaveBeenCalled();
-            expect(res.json).toHaveBeenCalledWith(mockRequests);
+            expect(res.json).toHaveBeenCalledWith({
+                data: mockRequests,
+                pagination: { total: 2, page: 1, limit: 20, pages: 1 }
+            });
         });
 
         test('should return 500 on server error', async () => {
-            Request.find.mockRejectedValue(new Error('DB Error'));
+            Request.find.mockImplementation(() => { throw new Error('DB Error'); });
             await requestController.getAllRequests(req, res);
             expect(res.status).toHaveBeenCalledWith(500);
         });
