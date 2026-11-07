@@ -2,6 +2,9 @@
 
 I have refactored the backend to use **MongoDB** instead of the local JSON file.
 
+> [!NOTE]
+> **Testing Environment**: For running automated tests (`npm test`), you **do not need** to install or run MongoDB locally. The test suite automatically spins up and tears down a secure, isolated in-memory MongoDB instance using `mongodb-memory-server`.
+
 ## Prerequisites
 
 Since MongoDB was not found in your system path, you need to install and start it:

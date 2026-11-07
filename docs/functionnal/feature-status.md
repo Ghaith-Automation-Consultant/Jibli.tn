@@ -1,4 +1,7 @@
 # État des Lieux - Jibli.tn
+
+> **Obsolète :** ce bilan concerne l'ancienne version Express/HTML. Voir [../tech/system-design.md](../tech/system-design.md)
+> pour l'état actuel et [../tech/improvement-plan.md](../tech/improvement-plan.md) pour la suite.
 **Feature Implementation Status Checklist**
 
 > **Légende:**

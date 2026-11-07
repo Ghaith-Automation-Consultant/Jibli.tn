@@ -13,10 +13,20 @@ const getMe = async (req, res) => {
     }
 };
 
+// Everything else (verification flags, lockout state, reviews, password) is not user-editable.
+const EDITABLE_FIELDS = ['name', 'location', 'bio', 'phone', 'languages', 'avatar'];
+
+const pickEditableFields = (body = {}) => {
+    const updates = {};
+    for (const field of EDITABLE_FIELDS) {
+        if (body[field] !== undefined) updates[field] = body[field];
+    }
+    return updates;
+};
+
 const updateMe = async (req, res) => {
     try {
-        const updates = req.body;
-        delete updates.password; // Don't allow password updates here
+        const updates = pickEditableFields(req.body);
 
         const user = await User.findByIdAndUpdate(
             req.user.id,
@@ -52,8 +62,7 @@ const updateUser = async (req, res) => {
             return res.status(403).json({ error: 'Unauthorized to update this user' });
         }
 
-        const updates = req.body;
-        delete updates.password; // Don't allow password updates
+        const updates = pickEditableFields(req.body);
 
         const user = await User.findByIdAndUpdate(
             req.params.id,

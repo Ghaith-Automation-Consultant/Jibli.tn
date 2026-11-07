@@ -8,16 +8,16 @@
     *   Filtres dynamiques : Départ/Arrivée, Date, Type (Gratuit/Payant), Poids max.
 *   **Recherche de Demandes** : Trouver des objets à transporter pour rentabiliser son voyage.
 *   **Affichage Dynamique** : Les résultats sont chargés depuis le backend via API.
-*   **Authentification** : Système de Login/Inscription (Simulé).
+*   **Authentification** : Inscription/connexion (Argon2id, cookies HttpOnly, refresh tokens rotatifs), changement de mot de passe.
 *   **Publication** : Poster un voyage ou une demande.
+*   **Messagerie** : Discussions entre utilisateurs.
 
 ## 🛠 Stack Technique
 
-*   **Frontend** : HTML5, Tailwind CSS, Vanilla JS.
-*   **Backend** : Node.js, Express.js.
-*   **Persistance** : MongoDB (Mongoose ODM).
-*   **Icons** : FontAwesome 5.15.
-*   **Fonts** : Cairo & Inter (Google Fonts).
+*   **Application** : Next.js 16 (App Router) + React 19, Tailwind CSS — pages dans `app/`, API dans `app/api/`.
+*   **Persistance** : MongoDB (Mongoose ODM), modèles partagés dans `backend/models/`.
+*   **Icons** : lucide-react.
+*   **Legacy** : l'ancien serveur Express (`server.js`, `backend/routes`, `pages/*.html`, `js/`) est conservé pendant la migration ; c'est lui que couvrent les tests Jest.
 
 ## 🏃 Comment Lancer le Projet
 
@@ -36,38 +36,37 @@
     ```bash
     npm install
     ```
-4.  (Optionnel) Initialiser la base de données :
+4.  (Optionnel) Initialiser la base de données — **attention : vide d'abord toutes les collections** de la base désignée par `MONGO_URI` :
     ```bash
     npm run seed
     ```
+    Comptes de test : `karim@test.com`, `leila@test.com`, … mot de passe `Test@123456789`.
+
+> **Sécurité** : `JWT_SECRET` doit être une valeur aléatoire propre à chaque environnement (ne réutilisez pas celle de `.env.example`). L'application refuse de démarrer en production sans `JWT_SECRET`.
 
 ### Démarrage
-1.  Lancer le serveur Backend :
-    ```bash
-    npm start
-    ```
-    *Le serveur démarrera sur http://localhost:3000*
-2.  Accéder à l'application dans votre navigateur :
-    *   Accueil : [http://localhost:3000/index.html](http://localhost:3000/index.html)
-    *   Recherche : [http://localhost:3000/recherche.html](http://localhost:3000/recherche.html)
-
-> **Note** : Le frontend est servi statiquement par le serveur Express.
+*   Développement : `npm run dev` → [http://localhost:3000](http://localhost:3000)
+*   Production : `npm run build` puis `npm run start:next`
+*   Ancienne version Express (legacy) : `npm start`
 
 ---
 
 ## 🧪 Tests Automatisés
 
-Le projet dispose d'une suite de tests complète (~88% success rate).
+Le projet dispose d'une suite de tests complète avec un taux de réussite de **100% (97/97 tests passés)**.
+
+Les tests d'intégration backend sont entièrement autonomes et s'exécutent sur une instance de base de données MongoDB en mémoire (`mongodb-memory-server`). Cela signifie que **vous n'avez pas besoin d'installer ou de démarrer un serveur MongoDB local** pour exécuter les tests.
 
 ### Lancer tous les tests
 ```bash
 npm test
 ```
 
-### Lancer les tests E2E (UI)
+### Lancer les tests E2E (application Next.js + API)
 ```bash
 npm run test:e2e
 ```
+Playwright compile l'application et la lance sur le port 3100 avec une base MongoDB en mémoire remplie par `backend/seed.js` : aucune base réelle n'est touchée. Navigateur requis : `npx playwright install chromium`.
 
 ### Générer le rapport de couverture
 ```bash
@@ -75,6 +74,11 @@ npm run test:coverage
 ```
 
 ---
+
+## 📚 Documentation technique
+
+*   [Conception du système](docs/tech/system-design.md) : architecture, API, sessions, modèle de données, sécurité.
+*   [Plan d'amélioration](docs/tech/improvement-plan.md) : priorités P0–P3.
 
 ## 📂 Structure du Projet
 

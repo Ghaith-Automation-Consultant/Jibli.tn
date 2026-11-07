@@ -14,4 +14,5 @@ const refreshTokenSchema = new mongoose.Schema({
 // Automatically expire documents based on expiresAt field (TTL index)
 refreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
-module.exports = mongoose.model('RefreshToken', refreshTokenSchema);
+module.exports = mongoose.models.RefreshToken || mongoose.model('RefreshToken', refreshTokenSchema);
+

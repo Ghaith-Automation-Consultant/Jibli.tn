@@ -1,117 +1,115 @@
 const { test, expect } = require('@playwright/test');
+const { KARIM, login, registerUser } = require('./helpers');
 
-test.describe('Trip Management Flow', () => {
-    let authToken;
+const inTenDays = () => new Date(Date.now() + 10 * 86400000).toISOString().slice(0, 10);
 
-    test.beforeEach(async ({ page }) => {
-        // Register and login before each test
-        await page.goto('/index.html');
-        await page.click('text=Inscription');
-        await page.waitForSelector('#registerModal', { state: 'visible' });
+test.describe('Listings', () => {
+    test('dashboard lists only my own listings', async ({ page }) => {
+        await login(page, KARIM.email);
 
-        const email = `trip-e2e-${Date.now()}@test.com`;
-        await page.fill('#registerEmail', email);
-        await page.fill('#registerPassword', 'test123456');
-        await page.fill('#registerName', 'Trip Test User');
-        await page.click('#registerModal button[type="submit"]');
-        await page.waitForTimeout(1000);
-
-        authToken = await page.evaluate(() => localStorage.getItem('jibli_token'));
+        await expect(page.getByRole('button', { name: /Mes voyages \([1-9]/ })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Supprimer' }).first()).toBeVisible();
+        // Paris -> Sfax belongs to another seeded user
+        await expect(page.getByText('Sfax')).toHaveCount(0);
     });
 
-    test('should allow creating a trip when logged in', async ({ page }) => {
-        await page.goto('/index.html');
+    test('publishes a trip, sees it on the dashboard, then deletes it', async ({ page, context }) => {
+        const user = await registerUser(context.request, 'Publie Voyage');
+        await login(page, user.email);
+        await expect(page.getByRole('button', { name: 'Mes voyages (0)' })).toBeVisible();
 
-        // Click "Publier un voyage" button
-        await page.click('text=Publier un voyage');
+        await page.goto('/poster-annonce?type=trip');
+        await page.getByPlaceholder('Ex: Paris').fill('Bordeaux');
+        await page.getByPlaceholder('Ex: Tunis').fill('Djerba');
+        await page.locator('input[type="date"]').fill(inTenDays());
+        await page.getByPlaceholder('Ex: 10').fill('12');
+        await page.locator('button[type="submit"]').click();
+        await expect(page.getByText('Annonce publiée avec succès')).toBeVisible();
 
-        // Wait for modal
-        await page.waitForSelector('#createTripModal', { state: 'visible' });
+        await expect(page).toHaveURL(/\/dashboard/);
+        await expect(page.getByRole('button', { name: 'Mes voyages (1)' })).toBeVisible();
+        await expect(page.getByText('Djerba')).toBeVisible();
 
-        // Fill trip form
-        await page.fill('#tripFrom', 'Paris');
-        await page.fill('#tripTo', 'Tunis');
-        await page.fill('#tripDate', '2024-06-01');
-        await page.fill('#tripArrivalDate', '2024-06-02');
-        await page.fill('#tripWeight', '10');
+        page.on('dialog', (dialog) => dialog.accept());
+        await page.getByRole('button', { name: 'Supprimer' }).click();
+        await expect(page.getByRole('button', { name: 'Mes voyages (0)' })).toBeVisible();
 
-        // Select size
-        await page.selectOption('#tripSize', 'M');
-
-        // Select price type
-        await page.check('input[name="priceType"][value="free"]');
-
-        // Submit form
-        await page.click('#tripForm button[type="submit"]');
-
-        // Wait for success
-        await page.waitForTimeout(1000);
-
-        // Verify trip was created (modal should close)
-        const modalVisible = await page.isVisible('#createTripModal');
-        expect(modalVisible).toBe(false);
+        await page.reload();
+        await expect(page.getByRole('button', { name: 'Mes voyages (0)' })).toBeVisible();
     });
 
-    test('should show validation errors for invalid trip data', async ({ page }) => {
-        await page.goto('/index.html');
-        await page.click('text=Publier un voyage');
-        await page.waitForSelector('#createTripModal', { state: 'visible' });
+    test('publishes a request with the optional weight left blank', async ({ page, context }) => {
+        const user = await registerUser(context.request, 'Publie Demande');
+        await login(page, user.email);
 
-        // Try to submit without required fields
-        await page.click('#tripForm button[type="submit"]');
+        await page.goto('/poster-annonce?type=request');
+        await page.getByPlaceholder(/^Ex: Médicaments/).fill('Livre rare');
+        await page.getByPlaceholder(/^Décrivez l'objet/).fill('Un livre de poche, emballé.');
+        await page.getByPlaceholder(/^Ex: Tunis/).fill('Sousse');
+        await page.locator('button[type="submit"]').click();
 
-        // Form should not submit (HTML5 validation or custom validation)
-        await page.waitForTimeout(500);
-
-        // Modal should still be visible
-        const modalVisible = await page.isVisible('#createTripModal');
-        expect(modalVisible).toBe(true);
+        await expect(page.getByText('Annonce publiée avec succès')).toBeVisible();
+        await expect(page).toHaveURL(/\/dashboard/);
+        await page.getByRole('button', { name: 'Mes demandes (1)' }).click();
+        await expect(page.getByText('Livre rare')).toBeVisible();
     });
 
-    test('should view trip details', async ({ page }) => {
-        // First create a trip
-        await page.goto('/index.html');
-        await page.click('text=Publier un voyage');
-        await page.waitForSelector('#createTripModal', { state: 'visible' });
+    test('explains why a past departure date is refused', async ({ page, context }) => {
+        const user = await registerUser(context.request, 'Date Passee');
+        await login(page, user.email);
 
-        await page.fill('#tripFrom', 'Lyon');
-        await page.fill('#tripTo', 'Tunis');
-        await page.fill('#tripDate', '2024-07-01');
-        await page.fill('#tripArrivalDate', '2024-07-02');
-        await page.fill('#tripWeight', '5');
-        await page.click('#tripForm button[type="submit"]');
-        await page.waitForTimeout(1000);
+        await page.goto('/poster-annonce?type=trip');
+        await page.getByPlaceholder('Ex: Paris').fill('Nice');
+        await page.getByPlaceholder('Ex: Tunis').fill('Tunis');
+        await page.locator('input[type="date"]').fill('2020-01-01');
+        await page.getByPlaceholder('Ex: 10').fill('5');
+        await page.locator('button[type="submit"]').click();
 
-        // Navigate to trips page
-        await page.click('text=Voyages');
-        await page.waitForTimeout(500);
+        await expect(page.getByText('La date de départ ne peut pas être dans le passé')).toBeVisible();
+    });
+});
 
-        // Click on a trip card (if exists)
-        const tripCard = page.locator('.trip-card').first();
-        if (await tripCard.isVisible()) {
-            await tripCard.click();
-            await page.waitForTimeout(500);
+test.describe('Messaging and profile', () => {
+    test('a brand new user can send a first message from a listing', async ({ page, context, request }) => {
+        const trips = (await (await request.get('/api/trips?limit=50')).json()).data;
+        const trip = trips[0];
 
-            // Should navigate to trip details page
-            expect(page.url()).toContain('voyage.html');
-        }
+        const user = await registerUser(context.request, 'Premier Contact');
+        await login(page, user.email);
+
+        await page.goto(`/voyage/${trip._id}`);
+        await page.getByRole('link', { name: `Contacter ${trip.user.name}` }).click();
+        await expect(page).toHaveURL(/\/messages\?userId=/);
+        await expect(page.getByRole('heading', { name: trip.user.name })).toBeVisible();
+
+        const box = page.getByPlaceholder('Écrivez votre message...');
+        await box.fill('Bonjour, reste-t-il de la place ?');
+        await box.press('Enter');
+
+        const bubble = page.locator('.bg-primary.text-white', { hasText: 'Bonjour, reste-t-il de la place ?' });
+        await expect(bubble).toBeVisible();
+        // Shown on my side of the thread, and the input was cleared
+        await expect(page.locator('.ml-auto', { hasText: 'Bonjour, reste-t-il' })).toBeVisible();
+        await expect(box).toHaveValue('');
+
+        await page.reload();
+        await expect(page.locator('.ml-auto', { hasText: 'Bonjour, reste-t-il' })).toBeVisible();
     });
 
-    test('should navigate to dashboard and see my trips', async ({ page }) => {
-        await page.goto('/index.html');
+    test('profile edits are saved', async ({ page, context }) => {
+        const user = await registerUser(context.request, 'Profil Modifie');
+        await login(page, user.email);
 
-        // Navigate to dashboard
-        await page.click('text=Dashboard');
-        await page.waitForURL('**/dashboard.html');
+        await page.goto('/profile');
+        await expect(page.getByRole('heading', { name: 'Profil Modifie' })).toBeVisible();
+        await expect(page.locator(`input[value="${user.email}"]`)).toBeVisible();
 
-        // Should see "Mes Voyages" tab
-        const myTripsTab = page.locator('text=Mes Voyages');
-        await expect(myTripsTab).toBeVisible();
+        const bio = page.locator('textarea').first();
+        await bio.fill('Je voyage souvent entre Lyon et Tunis.');
+        await page.getByRole('button', { name: 'Sauvegarder' }).click();
+        await expect(page.getByText('Votre profil a été mis à jour')).toBeVisible();
 
-        // Tab should be active by default
-        const isActive = await myTripsTab.evaluate(el =>
-            el.classList.contains('border-primary') || el.classList.contains('text-primary')
-        );
-        expect(isActive).toBe(true);
+        await page.reload();
+        await expect(page.locator('textarea').first()).toHaveValue('Je voyage souvent entre Lyon et Tunis.');
     });
 });

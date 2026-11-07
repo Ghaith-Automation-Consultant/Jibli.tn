@@ -3,11 +3,11 @@ const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    name: { type: String, required: true },
-    location: { type: String },
-    avatar: { type: String },
-    bio: { type: String },
-    phone: { type: String },
+    name: { type: String, required: true, trim: true, maxlength: [80, 'Le nom ne peut pas dépasser 80 caractères'] },
+    location: { type: String, maxlength: [120, 'La localisation ne peut pas dépasser 120 caractères'] },
+    avatar: { type: String, maxlength: [2048, "L'URL de la photo est trop longue"] },
+    bio: { type: String, maxlength: [500, 'La bio ne peut pas dépasser 500 caractères'] },
+    phone: { type: String, maxlength: [30, 'Le numéro de téléphone est trop long'] },
     languages: [{ type: String }],
     isEmailVerified: { type: Boolean, default: false },
     isPhoneVerified: { type: Boolean, default: false },
@@ -34,7 +34,8 @@ userSchema.virtual('id').get(function () {
 userSchema.set('toJSON', {
     virtuals: true,
     versionKey: false,
-    transform: function (doc, ret) { delete ret._id }
+    // Keep _id alongside the id virtual: the frontend reads _id on populated documents.
 });
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.models.User || mongoose.model('User', userSchema);
+

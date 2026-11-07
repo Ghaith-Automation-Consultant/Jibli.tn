@@ -6,8 +6,8 @@ const Message = require('./models/Message');
 const argon2 = require('argon2');
 require('dotenv').config();
 
-// Connect to MongoDB
-mongoose.connect('mongodb://127.0.0.1:27017/jibli')
+// Connect to MongoDB (same resolution order as backend/config/db.js)
+mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/jibli')
     .then(() => console.log('MongoDB Connected for Seeding'))
     .catch(err => {
         console.error('MongoDB Connection Error:', err);

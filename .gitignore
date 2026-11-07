@@ -35,3 +35,7 @@ yarn-error.log*
 
 # Temporary/Log files
 *.txt
+
+# Next.js build output
+.next/
+*.log

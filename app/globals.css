@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Styles personnalisés pour Jibli.tn */
+
+.language-switcher {
+    font-family: 'Noto Sans Arabic', sans-serif;
+}
+
+.rtl-text {
+    direction: rtl;
+}
+
+.filter-checkbox:checked:after {
+    content: "✓";
+    color: white;
+    position: absolute;
+    font-size: 12px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.search-result-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.map-container {
+    height: 400px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Faint grid drawn behind the blue hero/CTA sections (app/page.js) */
+.bg-grid-white {
+    background-image:
+        linear-gradient(to right, rgb(255 255 255 / 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+}

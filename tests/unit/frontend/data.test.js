@@ -27,7 +27,10 @@ describe('JibliData Client', () => {
         Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
         // Mock fetch
-        global.fetch = jest.fn();
+        global.fetch = jest.fn().mockImplementation(() => Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({})
+        }));
 
         // Reset state
         JibliData.trips = [];
@@ -36,8 +39,8 @@ describe('JibliData Client', () => {
 
     test('should manage auth token', () => {
         JibliData.setToken('fake-token');
-        expect(JibliData.getToken()).toBe('fake-token');
-        expect(window.localStorage.getItem('jibli_token')).toBe('fake-token');
+        expect(JibliData.getToken()).toBe('cookie_managed');
+        expect(window.localStorage.getItem('jibli_logged_in')).toBe('true');
 
         JibliData.clearToken();
         expect(JibliData.getToken()).toBeNull();
@@ -83,7 +86,7 @@ describe('JibliData Client', () => {
         expect(global.fetch).toHaveBeenCalledWith('/api/trips', expect.objectContaining({
             method: 'POST',
             headers: expect.objectContaining({
-                'Authorization': 'Bearer auth-token'
+                'Content-Type': 'application/json'
             })
         }));
     });
@@ -99,6 +102,6 @@ describe('JibliData Client', () => {
         const data = await JibliData.login('test@test.com', '123456');
 
         expect(data).toEqual(mockResponse);
-        expect(JibliData.getToken()).toBe('new-token');
+        expect(JibliData.getToken()).toBe('cookie_managed');
     });
 });

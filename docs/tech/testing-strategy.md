@@ -13,8 +13,8 @@
 - **Unit Tests:** 67 tests (92-100% coverage)
 - **Integration Tests:** 30 tests (full API coverage)
 - **E2E Tests:** 15+ tests (critical flows)
-- **Total Coverage:** 96 tests, ~88% pass rate (85 passing, 11 failing)
-- **Note:** Some intermittent failures related to MongoDB connection timing
+- **Total Coverage:** 97 tests, **100% pass rate (97 passing, 0 failing)**
+- **Note:** Solved database timeouts and environment dependencies by integrating `mongodb-memory-server` to run tests on a self-contained, in-memory database.
 
 ---
 
@@ -41,16 +41,13 @@
 - ✅ Works seamlessly with Jest
 - ✅ No need to start server manually
 
-#### **mongodb-memory-server** or **In-Memory DB**
-**Why?**
+#### **mongodb-memory-server** (In-Memory DB)
+**Why & How?**
+- ✅ **Fully Implemented** in `tests/db-setup.js`
 - ✅ Isolated test environment
 - ✅ Fast test execution
-- ✅ No side effects on real data
-- ✅ Easy CI/CD integration
-
-**For our JSON File Store:**
-- Create `backend/db.test.js` - in-memory version
-- Mock file system operations
+- ✅ No side effects on real database data
+- ✅ Zero-config local setup & Easy CI/CD integration
 
 ---
 

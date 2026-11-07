@@ -32,4 +32,5 @@ MessageSchema.index({ sender: 1, receiver: 1 });
 MessageSchema.index({ receiver: 1, sender: 1 });
 MessageSchema.index({ createdAt: -1 });
 
-module.exports = mongoose.model('Message', MessageSchema);
+module.exports = mongoose.models.Message || mongoose.model('Message', MessageSchema);
+

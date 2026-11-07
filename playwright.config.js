@@ -11,8 +11,8 @@ module.exports = defineConfig({
         timeout: 5000
     },
 
-    // Run tests in files in parallel
-    fullyParallel: true,
+    // Spec files run in parallel; tests within a file run in order
+    fullyParallel: false,
 
     // Fail the build on CI if you accidentally left test.only
     forbidOnly: !!process.env.CI,
@@ -20,8 +20,8 @@ module.exports = defineConfig({
     // Retry on CI only
     retries: process.env.CI ? 2 : 0,
 
-    // Opt out of parallel tests on CI
-    workers: process.env.CI ? 1 : undefined,
+    // Each login hashes with Argon2 (64 MB), so keep concurrency modest
+    workers: process.env.CI ? 1 : 2,
 
     // Reporter to use
     reporter: 'html',
@@ -29,7 +29,7 @@ module.exports = defineConfig({
     // Shared settings for all projects
     use: {
         // Base URL to use in actions like `await page.goto('/')`
-        baseURL: 'http://localhost:3000',
+        baseURL: 'http://localhost:3100',
 
         // Collect trace when retrying the failed test
         trace: 'on-first-retry',
@@ -48,22 +48,14 @@ module.exports = defineConfig({
             use: { ...devices['Desktop Chrome'] },
         },
 
-        {
-            name: 'firefox',
-            use: { ...devices['Desktop Firefox'] },
-        },
-
-        {
-            name: 'webkit',
-            use: { ...devices['Desktop Safari'] },
-        },
+        // Add firefox/webkit here after `npx playwright install firefox webkit`.
     ],
 
-    // Run your local dev server before starting the tests
+    // Builds and starts the Next.js app against a disposable in-memory database
     webServer: {
-        command: 'node server.js',
-        url: 'http://localhost:3000',
-        reuseExistingServer: true, // Always reuse existing server
-        timeout: 120 * 1000,
+        command: 'node tests/e2e/test-server.js',
+        url: 'http://localhost:3100/api/stats',
+        reuseExistingServer: false,
+        timeout: 300 * 1000,
     },
 });

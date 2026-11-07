@@ -6,10 +6,16 @@ module.exports = {
             testMatch: [
                 '<rootDir>/tests/integration/**/*.test.js',
                 '<rootDir>/backend/**/*.test.js', // Assuming potential colocated tests
-                '<rootDir>/tests/unit/backend/**/*.test.js', // If they exist
                 '<rootDir>/tests/sample.test.js'
             ],
             setupFilesAfterEnv: ['<rootDir>/tests/setup.js', '<rootDir>/tests/db-setup.js'],
+        },
+        {
+            // Pure logic (e.g. lib/rateLimit.js): no database to start
+            displayName: 'unit',
+            testEnvironment: 'node',
+            testMatch: ['<rootDir>/tests/unit/backend/**/*.test.js'],
+            setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
         },
         {
             displayName: 'frontend',

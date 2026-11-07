@@ -1,13 +1,22 @@
 const mongoose = require('mongoose');
+const { MongoMemoryServer } = require('mongodb-memory-server');
+
+let mongoServer;
 
 beforeAll(async () => {
     // Connect to a test database
-    const url = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/jibli_test';
+    mongoServer = await MongoMemoryServer.create();
+    const url = mongoServer.getUri();
     await mongoose.connect(url);
 });
 
 afterAll(async () => {
     // Clean up and close connection
-    await mongoose.connection.dropDatabase();
-    await mongoose.connection.close();
+    if (mongoose.connection.readyState !== 0) {
+        await mongoose.connection.dropDatabase();
+        await mongoose.connection.close();
+    }
+    if (mongoServer) {
+        await mongoServer.stop();
+    }
 });

@@ -1,5 +1,8 @@
 # Jibli.tn - Architecture Documentation
 
+> **Outdated:** this describes the earlier Express + static HTML version, which is now legacy.
+> The current design is in [../tech/system-design.md](../tech/system-design.md).
+
 **Last Updated:** 2026-01-26  
 **Version:** 1.0.0
 

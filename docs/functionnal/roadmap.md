@@ -13,10 +13,11 @@
 - [x] Frontend responsive avec Tailwind CSS
 
 ### Sécurité & Authentification
-- [x] ✅ JWT authentication avec tokens 7 jours
-- [x] ✅ Bcrypt password hashing (10 salt rounds)
+- [x] Rotation des Refresh Tokens et JWT via HttpOnly Cookies
+- [x] Hachage sécurisé Argon2id des mots de passe
 - [x] Auth middleware protégeant les routes sensibles
-- [x] Validation middleware sur tous les endpoints
+- [ ] Protection contre Injection NoSQL/XSS (`helmet`, `mongo-sanitize`, validation de schéma)
+- [ ] Flux de récupération de mot de passe (Forgot Password) via email
 
 ### Features Core
 - [x] CRUD complet pour Voyages (Trips)
@@ -38,7 +39,9 @@
 ### Performance & Scalabilité
 - [x] Filtrage et recherche côté serveur (Backend)
 - [x] Pagination des résultats (20 items/page) (Backend)
-- [ ] Indexation pour recherche rapide
+- [ ] **Migration Prioritaire** : Recherche client (`recherche.js`) vers des appels API paginés (Évite les crashs RAM)
+- [ ] Indexation MongoDB (Index composés géographiques et temporels)
+- [ ] Monitoring de Production : Intégration de logs robustes (`winston`, `morgan`)
 - [ ] Cache Redis pour requêtes fréquentes
 
 ### Rich Media
@@ -184,10 +187,11 @@
 
 ---
 
-## 🎯 Next Immediate Actions
+## 🎯 Next Immediate Actions (Priorités issues du dernier Audit Technique)
 
-1. **Compléter Phase 2** - Dashboard edit/delete UI
-2. **Lancer Beta** - 100 early adopters (diaspora tunisienne)
-3. **Collecter Feedback** - Itérer rapidement
-4. **Préparer Phase 3** - Messagerie et réputation
-5. **Lever Seed Round** - $500K-$1M pour scaling
+1. **Optimisation Performance Frontend** - Re-câbler `recherche.js` pour utiliser le filtrage API au lieu des tableaux en mémoire afin d'éviter les fuites de mémoire.
+2. **Sécurisation des Bases de Données** - Installer `helmet`, `mongo-sanitize` et valider les paramètres de requête pour bloquer les injections NoSQL.
+3. **Indexation Base de Données** - Appliquer les index composés critiques (villes, dates) pour accélérer le moteur de recherche backend.
+4. **Interface de Messagerie** - Connecter les composants UI frontend de chat aux endpoints backend existants (`/api/messages`) au lieu des alertes statiques.
+5. **Logs & Monitoring de Production** - Configurer les logs serveur structurés (`morgan`, `winston`) pour sécuriser le suivi post-déploiement.
+6. **Compléter Phase 2 & Lancer Beta** - Finir l'édition du Dashboard et tester avec les premiers utilisateurs de la diaspora.

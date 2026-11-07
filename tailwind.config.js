@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-    content: ["./pages/**/*.{html,js}", "./js/**/*.{html,js}"],
+    content: ["./pages/**/*.{html,js}", "./js/**/*.{html,js}", "./app/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
     theme: {
         extend: {
             colors: {
@@ -55,7 +55,20 @@ module.exports = {
             },
             fontFamily: {
                 'arabic': ['Noto Sans Arabic', 'sans-serif'],
-                'inter': ['Inter', 'sans-serif']
+                // --font-inter is set by next/font in app/layout.js
+                'inter': ['var(--font-inter)', 'Inter', 'sans-serif']
+            },
+            spacing: {
+                '4.5': '1.125rem'
+            },
+            keyframes: {
+                fadeIn: {
+                    from: { opacity: '0', transform: 'translateY(4px)' },
+                    to: { opacity: '1', transform: 'translateY(0)' }
+                }
+            },
+            animation: {
+                fadeIn: 'fadeIn 0.3s ease-out'
             }
         }
     },

@@ -1,101 +1,112 @@
 const { test, expect } = require('@playwright/test');
 
-test.describe('Search and Browse Flow', () => {
-    test('should navigate to search page', async ({ page }) => {
-        await page.goto('/index.html');
+test.describe('Browsing without an account', () => {
+    test('home page shows live listings that link to their detail pages', async ({ page }) => {
+        await page.goto('/');
 
-        // Click on "Voyages" in navigation
-        await page.click('text=Voyages');
+        const tripLink = page.locator('a[href^="/voyage/"]').first();
+        await expect(tripLink).toBeVisible();
+        await expect(page.locator('a[href^="/demande/"]').first()).toBeVisible();
 
-        // Should navigate to search/browse page
-        await page.waitForTimeout(500);
-
-        // Verify we're on the right page (could be recherche.html or similar)
-        // This depends on your navigation implementation
+        await tripLink.click();
+        await expect(page).toHaveURL(/\/voyage\/[0-9a-f]{24}/);
+        await expect(page.getByRole('heading', { name: 'Détails logistiques' })).toBeVisible();
     });
 
-    test('should display trip listings', async ({ page }) => {
-        await page.goto('/index.html');
+    test('search lists upcoming trips and hides completed ones', async ({ page }) => {
+        await page.goto('/recherche?type=trips');
 
-        // Navigate to trips page
-        await page.click('text=Voyages');
-        await page.waitForTimeout(1000);
-
-        // Check if trip cards are displayed
-        const tripCards = page.locator('.trip-card, [class*="trip"], [class*="voyage"]');
-        const count = await tripCards.count();
-
-        // Should have at least some trips (or empty state)
-        expect(count).toBeGreaterThanOrEqual(0);
+        await expect(page.getByRole('heading', { name: /voyages trouvés/ })).toBeVisible();
+        await expect(page.getByRole('link', { name: 'Contacter le Voyageur' }).first()).toBeVisible();
+        // The seed's only completed trip is Marseille -> Tunis, departed 10 days ago
+        await expect(page.getByText('Marseille')).toHaveCount(0);
     });
 
-    test('should filter trips by location', async ({ page }) => {
-        await page.goto('/index.html');
-        await page.click('text=Voyages');
-        await page.waitForTimeout(1000);
+    test('filters trips by departure city', async ({ page }) => {
+        await page.goto('/recherche?type=trips');
+        await page.getByRole('link', { name: 'Contacter le Voyageur' }).first().waitFor();
 
-        // Look for filter inputs
-        const fromFilter = page.locator('input[placeholder*="départ"], input[placeholder*="from"]').first();
-
-        if (await fromFilter.isVisible()) {
-            await fromFilter.fill('Paris');
-            await page.waitForTimeout(500);
-
-            // Results should be filtered
-            // This depends on your filtering implementation
-        }
+        await page.getByPlaceholder('Ville ou Pays').first().fill('Sfax');
+        await page.getByPlaceholder('Ville ou Pays').first().press('Enter');
+        await expect(page.getByRole('heading', { name: /^0 voyages trouvés/ })).toBeVisible();
     });
 
-    test('should display request listings', async ({ page }) => {
-        await page.goto('/index.html');
+    test('special characters in a search do not break it', async ({ page }) => {
+        await page.goto('/recherche?type=trips');
+        await page.getByRole('link', { name: 'Contacter le Voyageur' }).first().waitFor();
 
-        // Navigate to requests page
-        await page.click('text=Demandes');
-        await page.waitForTimeout(1000);
+        await page.getByPlaceholder('Ville ou Pays').first().fill('(*');
+        await page.getByPlaceholder('Ville ou Pays').first().press('Enter');
 
-        // Check if request cards are displayed
-        const requestCards = page.locator('.request-card, [class*="request"], [class*="demande"]');
-        const count = await requestCards.count();
-
-        expect(count).toBeGreaterThanOrEqual(0);
+        await expect(page.getByText('Aucun résultat correspondant')).toBeVisible();
     });
 
-    test('should navigate between tabs on search page', async ({ page }) => {
-        await page.goto('/index.html');
-        await page.click('text=Voyages');
-        await page.waitForTimeout(500);
+    test('switches to the requests tab', async ({ page }) => {
+        await page.goto('/recherche?type=trips');
+        await page.getByRole('button', { name: 'Rechercher une demande' }).click();
 
-        // Look for tabs (Voyages/Demandes)
-        const demandesTab = page.locator('text=Demandes').first();
-
-        if (await demandesTab.isVisible()) {
-            await demandesTab.click();
-            await page.waitForTimeout(500);
-
-            // Tab should be active
-            const isActive = await demandesTab.evaluate(el =>
-                el.classList.contains('active') ||
-                el.classList.contains('border-primary') ||
-                el.classList.contains('text-primary')
-            );
-            expect(isActive).toBe(true);
-        }
+        await expect(page.getByRole('heading', { name: /demandes trouvées/ })).toBeVisible();
+        await expect(page.getByRole('link', { name: 'Proposer mon trajet' }).first()).toBeVisible();
     });
 
-    test('should show empty state when no results', async ({ page }) => {
-        await page.goto('/index.html');
-        await page.click('text=Voyages');
-        await page.waitForTimeout(1000);
+    test('detail pages show the real owner rather than placeholder data', async ({ page, request }) => {
+        const trips = (await (await request.get('/api/trips?limit=50')).json()).data;
+        const notKarim = trips.find((trip) => !trip.user.name.startsWith('Karim'));
 
-        // Apply filter that returns no results
-        const fromFilter = page.locator('input[placeholder*="départ"]').first();
+        await page.goto(`/voyage/${notKarim._id}`);
 
-        if (await fromFilter.isVisible()) {
-            await fromFilter.fill('NonexistentCity12345');
-            await page.waitForTimeout(500);
-
-            // Should show empty state or "no results" message
-            // This depends on your implementation
-        }
+        await expect(page.getByRole('link', { name: `Contacter ${notKarim.user.name}` })).toBeVisible();
+        await expect(page.getByText('Karim')).toHaveCount(0);
+        await expect(page.getByText('Voyageur Vérifié')).toHaveCount(0);
     });
+
+    test('public profiles are readable and hide contact details', async ({ page, request }) => {
+        const trips = (await (await request.get('/api/trips?limit=1')).json()).data;
+        const owner = trips[0].user;
+
+        await page.goto(`/profile/${owner._id}`);
+
+        await expect(page).toHaveURL(new RegExp(`/profile/${owner._id}`));
+        await expect(page.getByRole('heading', { name: owner.name })).toBeVisible();
+        await expect(page.getByText('@test.com')).toHaveCount(0);
+    });
+
+    test('unknown listings show a French 404 page', async ({ page }) => {
+        const res = await page.goto('/voyage/000000000000000000000000');
+        expect(res.status()).toBe(404);
+        await expect(page.getByRole('heading', { name: 'Page introuvable' })).toBeVisible();
+    });
+
+    test('share button copies the listing link', async ({ page, context, request }) => {
+        await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+        const trips = (await (await request.get('/api/trips?limit=1')).json()).data;
+        await page.goto(`/voyage/${trips[0]._id}`);
+        // Force the clipboard fallback: headless desktop browsers have no share sheet
+        await page.evaluate(() => { delete Navigator.prototype.share; });
+
+        await page.getByRole('button', { name: 'Partager' }).click();
+
+        await expect(page.getByRole('button', { name: 'Lien copié' })).toBeVisible();
+        expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(page.url());
+    });
+
+    test('form fields are reachable by their labels', async ({ page }) => {
+        await page.goto('/register');
+        await page.getByLabel('Email').fill('label@test.com');
+        await expect(page.getByLabel('Email')).toHaveValue('label@test.com');
+    });
+
+    for (const [path, heading] of [
+        ['/conditions', "Conditions Générales d'Utilisation"],
+        ['/confidentialite', 'Politique de Confidentialité'],
+        ['/securite', 'Confiance & Sécurité'],
+    ]) {
+        test(`footer link ${path} opens its page`, async ({ page }) => {
+            await page.goto('/');
+            await page.locator(`footer a[href="${path}"]`).click();
+
+            await expect(page).toHaveURL(new RegExp(`${path}$`));
+            await expect(page.getByRole('heading', { name: heading })).toBeVisible();
+        });
+    }
 });
